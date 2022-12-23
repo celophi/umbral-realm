@@ -16,6 +16,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UmbralRealm.Login", "Umbral
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UmbralRealm.World", "UmbralRealm.World\UmbralRealm.World.csproj", "{CFEA553E-17CD-45B9-8832-66327E91FE15}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{45E3CC49-8622-4979-92BC-C42009C06E8E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbralRealm.Core.Tests", "Tests\UmbralRealm.Core.Tests\UmbralRealm.Core.Tests.csproj", "{853C7399-F63A-41FA-B674-A86277798504}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,9 +42,16 @@ Global
 		{CFEA553E-17CD-45B9-8832-66327E91FE15}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CFEA553E-17CD-45B9-8832-66327E91FE15}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CFEA553E-17CD-45B9-8832-66327E91FE15}.Release|Any CPU.Build.0 = Release|Any CPU
+		{853C7399-F63A-41FA-B674-A86277798504}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{853C7399-F63A-41FA-B674-A86277798504}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{853C7399-F63A-41FA-B674-A86277798504}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{853C7399-F63A-41FA-B674-A86277798504}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{853C7399-F63A-41FA-B674-A86277798504} = {45E3CC49-8622-4979-92BC-C42009C06E8E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B54FABAF-44EC-4CAF-96E0-D00F6DDC82C4}
