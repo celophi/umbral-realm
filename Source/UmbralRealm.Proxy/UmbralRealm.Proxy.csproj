@@ -22,5 +22,10 @@
     <ProjectReference Include="..\UmbralRealm.Login\UmbralRealm.Login.csproj" />
     <ProjectReference Include="..\UmbralRealm.World\UmbralRealm.World.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 
 </Project>

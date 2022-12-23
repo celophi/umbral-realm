@@ -3,7 +3,7 @@ using UmbralRealm.Core.Utilities;
 
 namespace UmbralRealm.Core.Network
 {
-    public class SocketConnectionFactory
+    public class SocketWrapperFactory
     {
         public SocketWrapper Create()
         {
