@@ -1,0 +1,27 @@
+//------------------------------------------------
+//--- 010 Editor v9.0.2 Binary Template
+//
+//      File: iostream.bt
+//   Authors: celophi
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+typedef struct {
+    int16 length;
+    if (length >0) {
+        char text[length];
+    }
+} LPString <read=LPStringRdr>;
+
+string LPStringRdr(LPString &v) {
+    if (v.length >0) {
+        return v.text;
+    } else {
+        return "";
+    }
+}

@@ -1,0 +1,21 @@
+//------------------------------------------------
+//--- 010 Editor v9.0.2 Binary Template
+//
+//      File: 0x0002_CL_WorldAuthenticate.bt
+//   Authors: celophi
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "includes/iostream.bt"
+
+// Sent from the client when the user has indicated the world they want to connect to.
+ushort opcode;
+
+ushort worldId;
+LPString account;
+LPString password;

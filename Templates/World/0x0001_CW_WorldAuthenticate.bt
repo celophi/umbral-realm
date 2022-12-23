@@ -1,0 +1,31 @@
+//------------------------------------------------
+//--- 010 Editor v9.0.2 Binary Template
+//
+//      File: 0x0001_CW_WorldAuthenticate.bt
+//   Authors: celophi
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "../Includes/iostream.bt"
+
+ushort opcode;
+
+uint u0;
+uint u1;
+
+// IP address of the world the client wants to connect to.
+uint IPAddress;
+
+// Port of the world the client wants to connect to.
+ushort Port;
+
+uint u2;
+uint u3;
+
+// Uniquely identifies the client's network adapater.
+LPString NetworkHardwareAddress;

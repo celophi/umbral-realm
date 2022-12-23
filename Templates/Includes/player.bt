@@ -1,0 +1,23 @@
+//------------------------------------------------
+//--- 010 Editor v9.0.2 Binary Template
+//
+//      File: player.bt
+//   Authors: celophi
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+enum <byte> PlayerClass { 
+    Swordsman = 1, 
+    Gunslinger = 2,
+    Mage = 9,
+    DragonKnight = 10,
+    Monk = 11,
+    Canoneer = 12,
+    Samurai = 13,
+    GuitarMagician = 27
+};

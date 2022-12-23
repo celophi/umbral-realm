@@ -1,0 +1,36 @@
+//------------------------------------------------
+//--- 010 Editor v9.0.2 Binary Template
+//
+//      File: 0x0005_CW_CreatePlayer.bt
+//   Authors: celophi
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+// Request to the server to create a player with a specific appearance.
+
+#include "../Includes/player.bt"
+
+ushort opcode;
+
+byte u0;
+PlayerClass class;
+byte u1;        // Seems to always be 0x01
+ushort u3;      // Seems to always be 0xFF 0xFF
+byte voice;
+ushort u4;
+byte u5;
+byte u6;
+byte data[23];
+
+uint64 hair : 12;       // goes from 0, 64, 128, 192, 256, 320, 384, 448
+uint64 face : 4;        // goes through 0->9
+uint64 hairColor : 8;   // 0, 4, 8.. 44
+uint64 skin : 4;        // 0 -> 3
+uint64 eyeColor : 8;    // 0, 4, 8, 12, 16, 20, 24, 28, 32, 36, ..96
+uint64 gender : 4;      // 1 for male, 0 for female
+uint64 u7 : 12;

@@ -1,0 +1,45 @@
+//------------------------------------------------
+//--- 010 Editor v9.0.2 Binary Template
+//
+//      File: 0x0005_LC_WorldSelection.bt
+//   Authors: celophi
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "../Includes/iostream.bt"
+
+// This packet populates the window on login for the user to choose a world to connec to.
+
+typedef struct {
+
+    // This ID starts at "1010"
+    // To represent multiple servers, increase by "1000" each time.
+    // To represent multiple channels, increase by "10" each time.
+    ushort worldId;
+
+    LPString worldName;
+    uint u4;
+    LPString u5;
+    ushort u6;
+    uint u0;
+    ushort u1;
+    ushort status;
+    ushort u2;
+    ushort population;
+    byte u3[4];
+    ushort capacity;
+
+} WorldSelectionInfo <optimize=false>;
+
+
+ushort opcode;
+
+ushort count;
+WorldSelectionInfo worlds[count];
+ushort defaultWorldId;
+byte u1;

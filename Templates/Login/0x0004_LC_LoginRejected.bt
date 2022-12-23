@@ -1,0 +1,19 @@
+//------------------------------------------------
+//--- 010 Editor v9.0.2 Binary Template
+//
+//      File: 0x0004_LC_LoginRejected.bt
+//   Authors: celophi
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+// This packet is sent when a LoginAuthenticate attempt has failed.
+
+ushort opcode;
+
+// This always seems to be '2'.
+ushort reason;

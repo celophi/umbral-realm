@@ -1,0 +1,19 @@
+//------------------------------------------------
+//--- 010 Editor v9.0.2 Binary Template
+//
+//      File: 0x0003_LC_ClientVersion.bt
+//   Authors: celophi
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+// This packet is sent first after the user clicks the login button.
+ushort opcode;
+
+// This appears to be the version of something. It is always "7".
+// However, when this is saved in the client, it is overwritten with a longer value.
+float version;

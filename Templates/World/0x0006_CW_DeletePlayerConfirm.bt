@@ -1,0 +1,19 @@
+//------------------------------------------------
+//--- 010 Editor v9.0.2 Binary Template
+//
+//      File: 0x0006_CW_DeletePlayerConfirm.bt
+//   Authors: celophi
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "../Includes/iostream.bt"
+
+ushort Opcode;
+
+uint PlayerId;
+LPString Password;

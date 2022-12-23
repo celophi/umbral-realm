@@ -1,0 +1,22 @@
+//------------------------------------------------
+//--- 010 Editor v9.0.2 Binary Template
+//
+//      File: 0x0001_CL_LoginAuthenticate.bt
+//   Authors: celophi
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "../Includes/iostream.bt"
+
+// After the client receives the "ClientVersion" packet,
+// This information is sent to the login server.
+ushort opcode;
+
+LPString account;
+LPString password;
+LPString clientVersion;
