@@ -25,7 +25,7 @@ namespace UmbralRealm.Proxy
 
 
 
-        private readonly SocketConnectionFactory _socketFactory;
+        private readonly SocketWrapperFactory _socketFactory;
 
         private readonly IPEndPoint _endpoint;
 
@@ -37,7 +37,7 @@ namespace UmbralRealm.Proxy
 
         private IConnectionFactory _connectionFactory;
 
-        public SocketClient(SocketConnectionFactory socketFactory, IPEndPoint endpoint, BufferBlock<IWriteConnection> requestQueue, IConnectionFactory connectionFactory)
+        public SocketClient(SocketWrapperFactory socketFactory, IPEndPoint endpoint, BufferBlock<IWriteConnection> requestQueue, IConnectionFactory connectionFactory)
         {
             _socketFactory = socketFactory ?? throw new ArgumentNullException(nameof(socketFactory));
             _endpoint = endpoint ?? throw new ArgumentNullException(nameof(endpoint));

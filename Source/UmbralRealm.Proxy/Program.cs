@@ -1,6 +1,6 @@
 ﻿using System.Net;
-using System.Net.Sockets;
 using System.Threading.Tasks.Dataflow;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using UmbralRealm.Core.Network;
@@ -22,8 +22,8 @@ namespace UmbralRealm.Proxy
         /// </summary>
         private class LoginServer : SocketServer
         {
-            public LoginServer(SocketWrapper listener, IPEndPoint endPoint, NetworkCertificate certificate, IConnectionFactory connectionFactory) 
-                : base(listener, endPoint, certificate, connectionFactory) { }
+            public LoginServer(SocketWrapperFactory socketFactory, IPEndPoint endPoint, NetworkCertificate certificate, IConnectionFactory connectionFactory) 
+                : base(socketFactory, endPoint, certificate, connectionFactory) { }
         }
 
         /// <summary>
@@ -32,8 +32,8 @@ namespace UmbralRealm.Proxy
         /// </summary>
         private class WorldServer : SocketServer
         {
-            public WorldServer(SocketWrapper listener, IPEndPoint endPoint, NetworkCertificate certificate, IConnectionFactory connectionFactory)
-                : base(listener, endPoint, certificate, connectionFactory) { }
+            public WorldServer(SocketWrapperFactory socketFactory, IPEndPoint endPoint, NetworkCertificate certificate, IConnectionFactory connectionFactory)
+                : base(socketFactory, endPoint, certificate, connectionFactory) { }
         }
 
 
@@ -46,9 +46,16 @@ namespace UmbralRealm.Proxy
 
         static void Main(string[] args)
         {
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false)
+                .Build();
+
             var host = new HostBuilder()
                 .ConfigureServices(services =>
                 {
+                    var socketFactory = new SocketWrapperFactory();
+
                     var loginOpcodeMapping = OpcodeMapping.Create(new Login.Packet.PacketOpcode());
                     
 
@@ -60,22 +67,24 @@ namespace UmbralRealm.Proxy
                     packetQueue.LinkTo(new ActionBlock<IPacket>(packet => HandlePacket(packet, loginOpcodeMapping)));
 
                     // Setup server
-                    var ipAddress = IPAddress.Parse("127.0.0.1");
-                    var endpoint = new IPEndPoint(ipAddress, 20000);
-                    var listenerSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                    var listenerAdapter = new SocketWrapper(listenerSocket);
+                    var loginOptions = configuration.GetSection(EndpointOptions.LocalLoginEndpoint).Get<EndpointOptions>();
+                    ArgumentNullException.ThrowIfNull(loginOptions);
+                    var endpoint = Program.ParseEndpoint(loginOptions);
+
+                    
                     var certificate = NetworkCertificate.CreatePrivateAsync().Result;
 
                     var activator = new ActivatorWrapper();
                     var packetFactory = new PacketConverter(loginOpcodeMapping, activator);
                     var connectionFactory = new ConnectionFactory(packetFactory);
 
-                    var server = new LoginServer(listenerAdapter, endpoint, certificate, connectionFactory);
+                    var server = new LoginServer(socketFactory, endpoint, certificate, connectionFactory);
 
                     // Setup proxy
-                    var remoteIp = IPAddress.Parse("0.0.0.0");
-                    var remoteEndpoint = new IPEndPoint(remoteIp, 6543);
-                    var socketFactory = new SocketConnectionFactory();
+
+                    var remoteOptions = configuration.GetSection(EndpointOptions.RemoteLoginEndpoint).Get<EndpointOptions>();
+                    ArgumentNullException.ThrowIfNull(remoteOptions);
+                    var remoteEndpoint = Program.ParseEndpoint(remoteOptions);
 
                     var proxy = new SocketClient(socketFactory, remoteEndpoint, requestQueue, connectionFactory);
 
@@ -87,14 +96,14 @@ namespace UmbralRealm.Proxy
 
                     services.AddHostedService(provider => server);
 
-
-
-
                     // World
-                    var worldEndpoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 20001);
-                    var worldServer = Program.CreateSocketServer(worldEndpoint, ServerType.World, worldRequestQueue, worldResponseQueue);
+                    var worldOptions = configuration.GetSection(EndpointOptions.LocalWorldEndpoint).Get<EndpointOptions>();
+                    ArgumentNullException.ThrowIfNull(worldOptions);
+                    var worldEndpoint = Program.ParseEndpoint(worldOptions);
 
-                    services.AddHostedService(provider => worldServer);
+                    _worldServer = Program.CreateSocketServer(worldEndpoint, ServerType.World, worldRequestQueue, worldResponseQueue);
+
+                    services.AddHostedService(provider => _worldServer);
                 })
                 .UseConsoleLifetime()
                 .Build();
@@ -102,6 +111,19 @@ namespace UmbralRealm.Proxy
             host.Run();
 
             Console.WriteLine("Hello, World!");
+        }
+
+        private static WorldServer _worldServer;
+
+        /// <summary>
+        /// Parse the options to return a useable endpoint.
+        /// </summary>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        private static IPEndPoint ParseEndpoint(EndpointOptions options)
+        {
+            var ipAddress = IPAddress.Parse(options.IPAddress);
+            return new IPEndPoint(ipAddress, options.Port);
         }
 
         private static void HandlePacket(IPacket packet, OpcodeMapping mapping)
@@ -138,8 +160,7 @@ namespace UmbralRealm.Proxy
 
         private static WorldServer CreateSocketServer(IPEndPoint endpoint, ServerType serverType, BufferBlock<IWriteConnection> requestQueue, BufferBlock<IWriteConnection> responseQueue)
         {
-            var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            var socketAdapter = new SocketWrapper(socket);
+            var socketFactory = new SocketWrapperFactory();
 
             var certificate = NetworkCertificate.CreatePrivateAsync().Result;
 
@@ -149,7 +170,7 @@ namespace UmbralRealm.Proxy
             var packetFactory = new PacketConverter(worldOpcodeMapping, activator);
             var connectionFactory = new ConnectionFactory(packetFactory);
 
-            var server = new WorldServer(socketAdapter, endpoint, certificate, connectionFactory);
+            var server = new WorldServer(socketFactory, endpoint, certificate, connectionFactory);
 
             server.Subscribe(requestQueue.AsObserver());
             server.Subscribe(responseQueue.AsObserver());
@@ -171,7 +192,7 @@ namespace UmbralRealm.Proxy
 
                 // proxy
                 var remoteEndpoint = new IPEndPoint(_realWorldIp, _realWorldPort);
-                var socketConnectionFactory = new SocketConnectionFactory();
+                var socketConnectionFactory = new SocketWrapperFactory();
 
                 
                 var packetQueue = new BufferBlock<IPacket>();
@@ -183,8 +204,8 @@ namespace UmbralRealm.Proxy
 
                 proxy.Subscribe(packetQueue.AsObserver());
 
-                worldConnectionPacket.WorldIPAddress = BitConverter.ToUInt32(IPAddress.Parse("127.0.0.1").GetAddressBytes(), 0);
-                worldConnectionPacket.WorldIPPort = 20001;
+                worldConnectionPacket.WorldIPAddress = BitConverter.ToUInt32(_worldServer.EndPoint.Address.GetAddressBytes(), 0);
+                worldConnectionPacket.WorldIPPort = (ushort)_worldServer.EndPoint.Port;
             }
         }
 

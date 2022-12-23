@@ -13,14 +13,19 @@ namespace UmbralRealm.Core.Network
     public class SocketServer : BackgroundService
     {
         /// <summary>
+        /// Used for creating sockets.
+        /// </summary>
+        private readonly SocketWrapperFactory _socketFactory;
+
+        /// <summary>
         /// Socket instance for accepting client connections.
         /// </summary>
-        private readonly SocketWrapper _listener;
+        private SocketWrapper _listener;
 
         /// <summary>
         /// Socket endpoint for listening for connections.
         /// </summary>
-        private readonly IPEndPoint _endPoint;
+        public readonly IPEndPoint EndPoint;
 
         /// <summary>
         /// Server RSA certificate for encrypting secrets and establishing a secure channel.
@@ -45,14 +50,14 @@ namespace UmbralRealm.Core.Network
         /// <summary>
         /// Creates a TCP server that can accept client connections.
         /// </summary>
-        /// <param name="listener"></param>
+        /// <param name="socketFactory"></param>
         /// <param name="endPoint"></param>
         /// <param name="certificate"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public SocketServer(SocketWrapper listener, IPEndPoint endPoint, NetworkCertificate certificate, IConnectionFactory connectionFactory)
+        public SocketServer(SocketWrapperFactory socketFactory, IPEndPoint endPoint, NetworkCertificate certificate, IConnectionFactory connectionFactory)
         {
-            _endPoint = endPoint ?? throw new ArgumentNullException(nameof(endPoint));
-            _listener = listener ?? throw new ArgumentNullException(nameof(listener));
+            _socketFactory = socketFactory ?? throw new ArgumentNullException(nameof(socketFactory));
+            this.EndPoint = endPoint ?? throw new ArgumentNullException(nameof(endPoint));
             _certificate = certificate ?? throw new ArgumentNullException(nameof(certificate));
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
         }
@@ -64,7 +69,8 @@ namespace UmbralRealm.Core.Network
         /// <returns></returns>
         public override async Task StartAsync(CancellationToken cancellationToken)
         {
-            _listener.Bind(_endPoint);
+            _listener = _socketFactory.Create();
+            _listener.Bind(this.EndPoint);
             _listener.Listen();
 
             var sendCertificateBlock = new TransformBlock<ISocketConnection?, ISocketConnection?>(async socketConnection => await this.SendCertificateAsync(socketConnection));
