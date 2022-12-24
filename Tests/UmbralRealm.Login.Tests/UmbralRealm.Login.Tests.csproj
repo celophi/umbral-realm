@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector" Version="3.1.2">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Projects\UmbralRealm.Core\UmbralRealm.Core.csproj" />
+    <ProjectReference Include="..\..\Projects\UmbralRealm.Login\UmbralRealm.Login.csproj" />
+    <ProjectReference Include="..\UmbralRealm.Testing.Utilities\UmbralRealm.Testing.Utilities.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Dumps\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\Dumps\Login\0x0001_CL_LoginAuthenticate.bin" Link="Dumps\0x0001_CL_LoginAuthenticate.bin" />
+    <EmbeddedResource Include="..\..\Dumps\Login\0x0002_CL_WorldAuthenticate.bin" Link="Dumps\0x0002_CL_WorldAuthenticate.bin" />
+    <EmbeddedResource Include="..\..\Dumps\Login\0x0003_LC_ClientVersion.bin" Link="Dumps\0x0003_LC_ClientVersion.bin" />
+    <EmbeddedResource Include="..\..\Dumps\Login\0x0004_LC_LoginRejected.bin" Link="Dumps\0x0004_LC_LoginRejected.bin" />
+    <EmbeddedResource Include="..\..\Dumps\Login\0x0005_LC_WorldSelection.bin" Link="Dumps\0x0005_LC_WorldSelection.bin" />
+    <EmbeddedResource Include="..\..\Dumps\Login\0x0006_LC_WorldConnection.bin" Link="Dumps\0x0006_LC_WorldConnection.bin" />
+  </ItemGroup>
+
+</Project>
