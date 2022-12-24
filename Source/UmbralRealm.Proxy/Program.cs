@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Threading.Tasks.Dataflow;
+using BinarySerialization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -152,9 +153,11 @@ namespace UmbralRealm.Proxy
                 Console.WriteLine($"Opcode: {unknownPacket.Opcode}");
             }
 
-            var data = packet.Serialize();
+            using var stream = new MemoryStream();
+            var serializer = new BinarySerializer();
+            serializer.Serialize(stream, packet);
 
-            Console.WriteLine($"{BitConverter.ToString(data)}");
+            Console.WriteLine($"{BitConverter.ToString(stream.ToArray())}");
             Console.WriteLine();
         }
 

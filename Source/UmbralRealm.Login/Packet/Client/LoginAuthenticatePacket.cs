@@ -1,4 +1,5 @@
-﻿using UmbralRealm.Core.IO;
+﻿using BinarySerialization;
+using UmbralRealm.Core.IO;
 using UmbralRealm.Core.Network.Packet;
 using UmbralRealm.Core.Network.Packet.Interfaces;
 
@@ -13,38 +14,19 @@ namespace UmbralRealm.Login.Packet.Client
         /// <summary>
         /// Username of the account.
         /// </summary>
-        public string Account { get; set; } = string.Empty;
+        [FieldOrder(0)]
+        public LengthPrefixedString Account { get; set; } = new();
 
         /// <summary>
         /// Encrypted or hashed password of the account.
         /// </summary>
-        public string Password { get; set; } = string.Empty;
+        [FieldOrder(1)]
+        public LengthPrefixedString Password { get; set; } = new();
 
         /// <summary>
         /// Version string of the client.
         /// </summary>
-        public string ClientVersion { get; set; } = string.Empty;
-
-        /// <inheritdoc/>
-        public byte[] Serialize()
-        {
-            using var writer = new BinaryStreamWriter();
-
-            writer.PutLPString(this.Account);
-            writer.PutLPString(this.Password);
-            writer.PutLPString(this.ClientVersion);
-
-            return writer.ToArray();
-        }
-
-        /// <inheritdoc/>
-        public void Deserialize(BinaryStreamReader reader)
-        {
-            ArgumentNullException.ThrowIfNull(reader, nameof(reader));
-
-            this.Account = reader.GetLPString();
-            this.Password = reader.GetLPString();
-            this.ClientVersion = reader.GetLPString();
-        }
+        [FieldOrder(2)]
+        public LengthPrefixedString ClientVersion { get; set; } = new();
     }
 }

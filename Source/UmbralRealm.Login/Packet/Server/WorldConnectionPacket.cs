@@ -1,4 +1,4 @@
-﻿using UmbralRealm.Core.IO;
+﻿using BinarySerialization;
 using UmbralRealm.Core.Network.Packet;
 using UmbralRealm.Core.Network.Packet.Interfaces;
 
@@ -13,40 +13,20 @@ namespace UmbralRealm.Login.Packet.Server
         /// <summary>
         /// Unknown. Seems unused?
         /// </summary>
+        [FieldOrder(0)]
         public uint Unknown1 { get; set; }
 
+        [FieldOrder(1)]
         public uint Unknown2 { get; set; }
 
+        [FieldOrder(2)]
         public uint WorldIPAddress { get; set; }
 
+        [FieldOrder(3)]
         public ushort WorldIPPort { get; set; }
 
+        [FieldOrder(4)]
+        [FieldLength(8)]
         public byte[] Unknown3 { get; set; } = new byte[8];
-
-        /// <inheritdoc/>
-        public byte[] Serialize()
-        {
-            using var writer = new BinaryStreamWriter();
-
-            writer.PutUInt32(this.Unknown1);
-            writer.PutUInt32(this.Unknown2);
-            writer.PutUInt32(this.WorldIPAddress);
-            writer.PutUInt16(this.WorldIPPort);
-            writer.PutBytes(this.Unknown3);
-
-            return writer.ToArray();
-        }
-
-        /// <inheritdoc/>
-        public void Deserialize(BinaryStreamReader reader)
-        {
-            ArgumentNullException.ThrowIfNull(reader, nameof(reader));
-
-            this.Unknown1 = reader.GetUInt32();
-            this.Unknown2 = reader.GetUInt32();
-            this.WorldIPAddress = reader.GetUInt32();
-            this.WorldIPPort = reader.GetUInt16();
-            this.Unknown3 = reader.GetBytes(8);
-        }
     }
 }

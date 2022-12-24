@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BinarySerializer" Version="8.6.2.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\UmbralRealm.Core\UmbralRealm.Core.csproj" />
   </ItemGroup>
 
