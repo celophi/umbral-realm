@@ -22,6 +22,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Projects\UmbralRealm.Core\UmbralRealm.Core.csproj" />
+    <ProjectReference Include="..\..\Projects\UmbralRealm.Login\UmbralRealm.Login.csproj" />
+    <ProjectReference Include="..\UmbralRealm.Testing.Utilities\UmbralRealm.Testing.Utilities.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Dumps\" />
   </ItemGroup>
 
@@ -32,12 +38,6 @@
     <EmbeddedResource Include="..\..\Dumps\Login\0x0004_LC_LoginRejected.bin" Link="Dumps\0x0004_LC_LoginRejected.bin" />
     <EmbeddedResource Include="..\..\Dumps\Login\0x0005_LC_WorldSelection.bin" Link="Dumps\0x0005_LC_WorldSelection.bin" />
     <EmbeddedResource Include="..\..\Dumps\Login\0x0006_LC_WorldConnection.bin" Link="Dumps\0x0006_LC_WorldConnection.bin" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Projects\UmbralRealm.Core\UmbralRealm.Core.csproj" />
-    <ProjectReference Include="..\..\Projects\UmbralRealm.Login\UmbralRealm.Login.csproj" />
-    <ProjectReference Include="..\UmbralRealm.Testing.Utilities\UmbralRealm.Testing.Utilities.csproj" />
   </ItemGroup>
 
 </Project>

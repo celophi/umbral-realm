@@ -21,8 +21,8 @@ jobs:
       with:
         dotnet-version: 6.0.x
     - name: Restore dependencies
-      run: dotnet restore Source/UmbralRealm.sln
+      run: dotnet restore UmbralRealm.sln
     - name: Build
-      run: dotnet build --no-restore Source/UmbralRealm.sln
+      run: dotnet build --no-restore UmbralRealm.sln
     - name: Test
-      run: dotnet test --no-build --verbosity normal Source/UmbralRealm.sln
+      run: dotnet test --no-build --verbosity normal UmbralRealm.sln
