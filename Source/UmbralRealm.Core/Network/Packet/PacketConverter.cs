@@ -1,4 +1,5 @@
-﻿using UmbralRealm.Core.IO;
+﻿using BinarySerialization;
+using UmbralRealm.Core.IO;
 using UmbralRealm.Core.Network.Packet.Interfaces;
 using UmbralRealm.Core.Network.Packet.Model.Generic;
 using UmbralRealm.Core.Security.Interfaces;
@@ -42,7 +43,11 @@ namespace UmbralRealm.Core.Network.Packet
                 throw new KeyNotFoundException($"Error. Model type {packet.GetType()} has not been registered.");
             }
 
-            plainTextWriter.PutBytes(packet.Serialize());
+            using var stream = new MemoryStream();
+            var serializer = new BinarySerializer();
+            serializer.Serialize(stream, packet);
+
+            plainTextWriter.PutBytes(stream.ToArray());
 
             var encrypted = cipher.RunCipher(plainTextWriter.ToArray());
             encryptedWriter.PutUInt16((ushort)encrypted.Length);
@@ -91,24 +96,21 @@ namespace UmbralRealm.Core.Network.Packet
 
             using var reader = new BinaryStreamReader(buffer);
             var opcode = reader.GetUInt16();
+            var remaining = reader.GetRemaining();
 
-            IPacket packet = new UnknownPacket();
-
-            if (_opcodeMapping.TryGetByOpcode(opcode, out var map) 
-                && map.Model != null
-                && _activator.CreateInstance(map.Model) is IPacket instance)
-            {
-                packet = instance;
-            }
-
-            if (packet is UnknownPacket)
-            {
-                reader.Position = 0;
-            }
+            _opcodeMapping.TryGetByOpcode(opcode, out var map);
+            var packetType = map?.Model ?? typeof(UnknownPacket);
 
             try
             {
-                packet.Deserialize(reader);
+                // TODO: Find a cleaner way to include the opcode either always or never.
+                if (packetType != typeof(UnknownPacket))
+                {
+                    buffer = remaining;
+                }
+
+                var serializer = new BinarySerializer();
+                return (IPacket)serializer.Deserialize(buffer, packetType);
             }
             catch (Exception ex)
             {
@@ -116,8 +118,6 @@ namespace UmbralRealm.Core.Network.Packet
                 Console.WriteLine(ex.Message);
                 throw;
             }
-
-            return packet;
         }
     }
 }

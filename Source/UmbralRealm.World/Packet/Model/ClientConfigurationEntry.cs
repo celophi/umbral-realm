@@ -1,4 +1,7 @@
-﻿namespace UmbralRealm.World.Packet.Model
+﻿using BinarySerialization;
+using UmbralRealm.Core.IO;
+
+namespace UmbralRealm.World.Packet.Model
 {
     /// <summary>
     /// Entry in the client.ini file.
@@ -8,11 +11,13 @@
         /// <summary>
         /// The index associated with a certain line in the file.
         /// </summary>
+        [FieldOrder(0)]
         public ClientConfigurationType Type { get; set; }
 
         /// <summary>
         /// The file associated with a certain line in the file.
         /// </summary>
-        public string Value { get; set; } = string.Empty;
+        [FieldOrder(1)]
+        public LengthPrefixedString Value { get; set; } = new();
     }
 }

@@ -1,4 +1,4 @@
-﻿using UmbralRealm.Core.IO;
+﻿using BinarySerialization;
 using UmbralRealm.Core.Network.Packet;
 using UmbralRealm.Core.Network.Packet.Interfaces;
 
@@ -13,24 +13,7 @@ namespace UmbralRealm.Login.Packet.Server
         /// <summary>
         /// Unknown, but my guess is that this is some index to the reason of the failure.
         /// </summary>
+        [FieldOrder(0)]
         public ushort Reason { get; set; }
-
-        /// <inheritdoc/>
-        public byte[] Serialize()
-        {
-            using var writer = new BinaryStreamWriter();
-
-            writer.PutUInt16(this.Reason);
-
-            return writer.ToArray();
-        }
-
-        /// <inheritdoc/>
-        public void Deserialize(BinaryStreamReader reader)
-        {
-            ArgumentNullException.ThrowIfNull(reader, nameof(reader));
-
-            this.Reason = reader.GetUInt16();
-        }
     }
 }
