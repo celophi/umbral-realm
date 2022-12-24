@@ -1,4 +1,5 @@
-﻿using UmbralRealm.Core.Security;
+﻿using System;
+using UmbralRealm.Core.Security;
 using Xunit;
 
 namespace UmbralRealm.Core.Tests.Security
