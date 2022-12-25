@@ -1,10 +1,11 @@
 ﻿using BinarySerialization;
 using UmbralRealm.Core.Network.Packet;
+using UmbralRealm.Core.Network.Packet.Interfaces;
 
 namespace UmbralRealm.World.Packet.Server
 {
     [PacketOpcodeMapping((ushort)PacketOpcode.WorldLoginAcknowledge)]
-    public class WorldLoginAcknowledgePacket
+    public class WorldLoginAcknowledgePacket : IPacket
     {
         /// <summary>
         /// This does not seem used.

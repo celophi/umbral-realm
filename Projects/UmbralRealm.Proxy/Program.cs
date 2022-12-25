@@ -12,6 +12,7 @@ using UmbralRealm.Core.Network.Packet.Model.Generic;
 using UmbralRealm.Core.Security;
 using UmbralRealm.Core.Utilities;
 using UmbralRealm.Login.Packet.Server;
+using UmbralRealm.World.Packet.Server;
 
 namespace UmbralRealm.Proxy
 {

@@ -1,0 +1,18 @@
+//------------------------------------------------
+//--- 010 Editor v9.0.2 Binary Template
+//
+//      File: 0x002B_WC_UnknownTimestamps.bt
+//   Authors: celophi
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+ushort Opcode;
+
+uint futureTimestamp;  // (2 hours in the future)
+uint u2;
+uint pastTimestamp;    // (3 hours in the past)

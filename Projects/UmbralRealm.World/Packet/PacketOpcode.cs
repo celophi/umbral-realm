@@ -57,10 +57,22 @@ namespace UmbralRealm.World.Packet
         WorldLoginFailure = 0x0026,
 
         /// <summary>
+        /// Upon clicking "start game" at the character select screen, server sends zone connection information.
+        /// </summary>
+        [PacketOpcodeMetadata(PacketOrigin.Server, ServerType.World)]
+        ZoneConnection = 0x0028,
+
+        /// <summary>
         /// Sent from the server with all the player info to select from.
         /// </summary>
         [PacketOpcodeMetadata(PacketOrigin.Server, ServerType.World)]
         PlayerSelectionList = 0x0029,
+
+        /// <summary>
+        /// Timestamps that seem to be hours in the future and past.
+        /// </summary>
+        [PacketOpcodeMetadata(PacketOrigin.Server, ServerType.World)]
+        UnknownTimestamps = 0x002B,
 
         /// <summary>
         /// Response from the server indicating an acknowledgement of <see cref="PlayerDeleteIntent"/>.
