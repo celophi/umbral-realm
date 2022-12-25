@@ -1,0 +1,23 @@
+//------------------------------------------------
+//--- 010 Editor v9.0.2 Binary Template
+//
+//      File: 0x0028_WC_ZoneConnection.bt
+//   Authors: celophi
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+ushort opcode;
+
+uint u0;
+uint u1;
+
+uint IPAddress;
+ushort port;
+
+uint u2;
+uint u4;
