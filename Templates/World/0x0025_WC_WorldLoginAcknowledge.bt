@@ -1,0 +1,19 @@
+//------------------------------------------------
+//--- 010 Editor v9.0.2 Binary Template
+//
+//      File: 0x0025_WC_WorldLoginAcknowledge.bt
+//   Authors: celophi
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+// Packet which is sent as a response to a login request on a world server.
+ushort Opcode;
+
+// This doesn't seem to be necessary.
+// In the client, the handler code is null.
+uint Unused;
