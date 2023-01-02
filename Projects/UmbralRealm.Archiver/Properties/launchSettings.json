@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "UmbralRealm.Archiver": {
+      "commandName": "Project",
+      "commandLineArgs": "-s C:\\temp\\source -d C:\\temp\\destination"
+    }
+  }
+}
