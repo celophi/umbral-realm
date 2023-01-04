@@ -1,116 +1,143 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using BinarySerialization;
-using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
-using UmbralRealm.Core.IO;
+using Ralph.Crc32C;
+using Zlib.Extended;
+using Zlib.Extended.Enumerations;
 
 namespace UmbralRealm.Archiver
 {
+    /// <summary>
+    /// Provides methods for uncompressing files described by a package index.
+    /// </summary>
     public class Unpacker
     {
+        /// <summary>
+        /// Absolute path to the package index file.
+        /// </summary>
         private readonly string _indexPath;
 
-        public Unpacker(string indexPath)
+        /// <summary>
+        /// Absolute path to the destination where to write uncompressed files.
+        /// </summary>
+        private readonly string _outputPath;
+
+        /// <summary>
+        /// Creates an unpacker that can decompress files listed within a package index.
+        /// </summary>
+        /// <param name="indexPath"></param>
+        /// <param name="outputPath"></param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public Unpacker(string indexPath, string outputPath)
         {
             _indexPath = indexPath ?? throw new ArgumentNullException(nameof(indexPath));
+            _outputPath = outputPath ?? throw new ArgumentNullException(nameof(outputPath));
         }
 
-        public async Task Run(string outputPath)
+        /// <summary>
+        /// Runs the unpacker decompressing all files.
+        /// </summary>
+        /// <returns></returns>
+        public async Task Run()
         {
-            var buffer = await File.ReadAllBytesAsync(_indexPath);
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            Console.WriteLine("Loading package index file...");
 
-            var serializer = new BinarySerializer();
-            var index = await serializer.DeserializeAsync<PackageIndex>(buffer);
+            var index = await this.LoadPackageIndex();
+            Console.WriteLine("Package index deserialized!");
 
-            if (index == null)
-            {
-                throw new InvalidDataException("Package index data is invalid.");
-            }
-
-            //Parallel.ForEach(index.Entries, (entry) =>
-            //{
-            foreach (var entry in index.Entries)
+            Console.WriteLine($"Decompressing {index.Entries.Count} files...");
+            await Parallel.ForEachAsync(index.Entries, async (entry, _) =>
             {
                 try
                 {
+                    var filename = Path.GetFileName(_indexPath);
                     var packageId = entry.PackageId.ToString("D3");
-                    var archive = _indexPath.Replace("pkg.idx", $"pkg{packageId}.pkg");
+                    var archive = _indexPath.Replace(filename, $"pkg{packageId}.pkg");
 
                     var compressed = new byte[entry.CompressedSize];
                     using var fs = File.OpenRead(archive);
                     fs.Position = entry.CompressedOffset;
-                    fs.Read(compressed, 0, compressed.Length);
+                    await fs.ReadAsync(compressed, _);
 
-                    //using var reader = new BinaryStreamReader(compressed);
-                    //if (reader.GetUInt16() != 0x9C78)
-                    //{
-                    //    using var writer = new BinaryStreamWriter();
-                    //    writer.PutUInt16(0x9C78);
-                    //    writer.PutBytes(compressed);
-                    //    compressed = writer.ToArray();
-                    //}
+                    var outputdata = this.DecompressData(compressed, (int)entry.DecompressedSize);
 
-                    using var outputstream = new MemoryStream();
-                    using var ms = new MemoryStream(compressed);
-                    using var inflater = new InflaterInputStream(ms);
-                    inflater.CopyTo(outputstream);
+                    if (!this.IsChecksumValid(entry.Checksum, outputdata))
+                    {
+                        throw new InvalidDataException("Error. Checksum for the decompressed data is invalid.");
+                    }
 
-                    //else
-                    //{
-                    //    using var ds = new DeflateStream(ms, CompressionMode.Decompress);
-                    //    ds.CopyTo(outputstream);
-                    //}
-
-                    var outputFile = Path.Combine(outputPath, entry.FilePath.Trim('\0'));
-                    var fullPath = Path.Combine(outputFile, entry.FileName.Trim('\0'));
-                    var fileDirectory = Path.GetDirectoryName(fullPath);
-                    Directory.CreateDirectory(fileDirectory!);
-
-                    File.WriteAllBytes(fullPath, outputstream.ToArray());
+                    var absolutePath = Path.Combine(_outputPath, entry.FilePath, entry.FileName);
+                    await this.WriteDecompressedFile(absolutePath, outputdata);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    var a = ex;
+                    Console.WriteLine("Error. Unable to decompress file correctly.");
+                    throw;
                 }
+            });
+
+            sw.Stop();
+            Console.WriteLine($"Finished decompressing files in {sw.Elapsed.TotalSeconds} seconds!");
+        }
+
+        /// <summary>
+        /// Loads the package index file and deserializes it.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="InvalidDataException"></exception>
+        private async Task<PackageIndex> LoadPackageIndex()
+        {
+            var serializer = new BinarySerializer();
+            var buffer = await File.ReadAllBytesAsync(_indexPath);
+            var index = await serializer.DeserializeAsync<PackageIndex>(buffer);
+            return index ?? throw new InvalidDataException("Package index data is invalid.");
+        }
+
+        /// <summary>
+        /// Decompresses a byte array.
+        /// </summary>
+        /// <param name="data">Compressed data.</param>
+        /// <param name="size">Expected size of the decompressed data.</param>
+        /// <returns></returns>
+        /// <exception cref="InvalidDataException"></exception>
+        private byte[] DecompressData(byte[] data, int size)
+        {
+            var buffer = new byte[size];
+
+            if (Compressor.Decompress(data, ref buffer) != ReturnCode.Z_STREAM_END)
+            {
+                throw new InvalidDataException("Error. Unable to decompress data correctly.");
             }
 
-                
-            //});
+            return buffer;
+        }
 
+        /// <summary>
+        /// Saves the decompressed data to a file on disk.
+        /// </summary>
+        /// <param name="path">Absolute path including file name to where the data should be saved.</param>
+        /// <param name="data">Decompressed data.</param>
+        /// <returns></returns>
+        private async Task WriteDecompressedFile(string path, byte[] data)
+        {
+            var directory = Path.GetDirectoryName(path);
+            Directory.CreateDirectory(directory!);
+            await File.WriteAllBytesAsync(path, data);
+        }
 
-
-
-
-
-
-            //var compressed = new byte[108769];
-
-            //using (var fs = File.OpenRead("pkg001.pkg"))
-            //{
-            //    fs.ReadByte();
-            //    fs.ReadByte();
-            //    fs.Read(compressed, 0, compressed.Length);
-            //}
-
-            //using (var ms = new MemoryStream(compressed))
-            //using (var ms2 = new MemoryStream())
-            //using (var ds = new DeflateStream(ms, CompressionMode.Decompress))
-            //{
-            //    ds.CopyTo(ms2);
-
-
-            //    File.WriteAllBytes("output.bin", ms2.ToArray());
-            //}
-
-
-
-
-
+        /// <summary>
+        /// Performs a CRC32C checksum over a byte array and returns 'true' if the value is the expected value.
+        /// </summary>
+        /// <param name="expected">Expected checksum value</param>
+        /// <param name="data">Data to perform the check over</param>
+        /// <returns></returns>
+        private bool IsChecksumValid(uint expected, byte[] data)
+        {
+            var crc = new Crc32C();
+            crc.Update(data, 0, data.Length);
+            return expected == crc.GetIntValue();
         }
     }
 }

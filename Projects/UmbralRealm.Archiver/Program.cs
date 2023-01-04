@@ -19,13 +19,10 @@ namespace UmbralRealm.Archiver
             }
 
             var indexPath = Path.Combine(result.Value.Source, _packageIndexFileName);
-            var unpacker = new Unpacker(indexPath);
+            var unpacker = new Unpacker(indexPath, result.Value.Destination);
+            unpacker.Run().Wait();
 
-            Console.WriteLine("Unpacking...");
-
-            unpacker.Run(result.Value.Destination).Wait();
-
-            Console.WriteLine("Complete.");
+            Console.WriteLine("Press any key to exit the application.");
             Console.ReadLine();
         }
 

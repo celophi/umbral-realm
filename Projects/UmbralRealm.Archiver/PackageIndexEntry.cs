@@ -32,71 +32,79 @@ namespace UmbralRealm.Archiver
         public uint CompressedSize { get; set; }
 
         /// <summary>
-        /// CRC value to ensure that data is decompressed correctly.
+        /// CRC32C value to ensure that data is decompressed correctly.
         /// </summary>
         [FieldOrder(4)]
-        public ulong CRC { get; set; }
+        public uint Checksum { get; set; }
 
         /// <summary>
         /// Unknown.
         /// </summary>
         [FieldOrder(5)]
-        public ulong Flags { get; set; }
+        public uint Unknown1 { get; set; }
 
         /// <summary>
         /// Unknown.
         /// </summary>
         [FieldOrder(6)]
-        public ulong TimeUnknown1 { get; set; }
+        public ulong Flags { get; set; }
 
         /// <summary>
         /// Unknown.
         /// </summary>
         [FieldOrder(7)]
-        public ulong TimeUnknown2 { get; set; }
+        public ulong TimeUnknown1 { get; set; }
 
         /// <summary>
         /// Unknown.
         /// </summary>
         [FieldOrder(8)]
+        public ulong TimeUnknown2 { get; set; }
+
+        /// <summary>
+        /// Unknown.
+        /// </summary>
+        [FieldOrder(9)]
         public ulong TimeUnknown3 { get; set; }
 
         /// <summary>
         /// Size in bytes of the decompressed data region.
         /// </summary>
-        [FieldOrder(9)]
+        [FieldOrder(10)]
         public uint DecompressedSize { get; set; }
 
         /// <summary>
         /// Name of the data region.
         /// </summary>
-        [FieldOrder(10)]
+        [FieldOrder(11)]
         [FieldLength(260)]
+        [SerializeAs(SerializedType.TerminatedString)]
         public string FileName { get; set; } = string.Empty;
 
         /// <summary>
         /// Name of the directory where the file should reside.
         /// </summary>
-        [FieldOrder(11)]
+        [FieldOrder(12)]
         [FieldLength(260)]
+        [SerializeAs(SerializedType.TerminatedString)]
         public string FilePath { get; set; } = string.Empty;
 
         /// <summary>
         /// Unknown.
         /// </summary>
-        [FieldOrder(12)]
-        public uint Unknown1 { get; set; }
+        [FieldOrder(13)]
+        public uint Unknown2 { get; set; }
 
         /// <summary>
         /// Identifier of the package where this data is applicable.
         /// </summary>
-        [FieldOrder(13)]
+        [FieldOrder(14)]
         public uint PackageId { get; set; }
 
         /// <summary>
         /// Unknown.
         /// </summary>
-        [FieldOrder(14)]
-        public uint Unknown2 { get; set; }
+        [FieldOrder(15)]
+        public uint Unknown3 { get; set; }
     }
 }

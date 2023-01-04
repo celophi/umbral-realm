@@ -26,7 +26,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UmbralRealm.Login.Tests", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UmbralRealm.Testing.Utilities", "Tests\UmbralRealm.Testing.Utilities\UmbralRealm.Testing.Utilities.csproj", "{1BA0C7DA-9FAB-40B9-A783-323A73FB9683}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbralRealm.Archiver", "Projects\UmbralRealm.Archiver\UmbralRealm.Archiver.csproj", "{4BD2877C-780D-494A-AF0C-64EA1FA04AAB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UmbralRealm.Archiver", "Projects\UmbralRealm.Archiver\UmbralRealm.Archiver.csproj", "{4BD2877C-780D-494A-AF0C-64EA1FA04AAB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
