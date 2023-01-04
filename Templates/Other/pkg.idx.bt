@@ -1,0 +1,73 @@
+//------------------------------------------------
+//--- 010 Editor v9.0.2 Binary Template
+//
+//      File: pkg.idx.bt
+//   Authors: celophi
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+typedef struct {
+
+    // Unique ID for this block in the index file.
+    uint EntryId;
+
+    // Offset into the package where the compressed data exists.
+    uint CompressedOffset;
+
+    // Offset into the package where this entry is located.
+    uint EntryOffset;
+
+    // Size in bytes of the compressed data region.
+    uint CompressedSize;
+    
+    // CRC32C checksum of the decompressed data.
+    uint Checksum;
+    
+    uint Unknown1;
+
+    int64 Flags;
+    
+    time64_t TimeUnknown1;
+    
+    time64_t TimeUnknown2;
+    
+    time64_t TimeUnknown3;
+    
+    // Size of the decompressed data in bytes.
+    uint DecompressedSize;
+    
+    // Name of the file.
+    char FileName[260];
+    
+    // Directory where the file should be placed.
+    char FilePath[260];
+    
+    uint Unknown2;
+    
+    // Package number this file belongs to. (pkg%0d.pkg)
+    uint PackageId;
+    
+    uint Unknown3;
+
+} Entry;
+
+// All of this seems to be padding bytes of 0x00.
+byte Padding[260];
+
+// Package versioning string. "PackVer01"
+char Version[32];
+
+local uint remaining = FileSize() - FTell();
+local uint count = remaining / sizeof(Entry);
+
+Entry entries[count];
+
+
+
+
+
