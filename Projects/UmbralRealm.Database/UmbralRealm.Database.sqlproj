@@ -63,5 +63,6 @@
   <ItemGroup>
     <Build Include="dbo\Tables\Account.sql" />
     <Build Include="dbo\Stored Procedures\Account_Insert.sql" />
+    <Build Include="dbo\Stored Procedures\Account_Select_ByName.sql" />
   </ItemGroup>
 </Project>
