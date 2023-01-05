@@ -72,7 +72,6 @@ Global
 		{2BCDC9DB-2F0B-4607-804E-0754F6413E9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2BCDC9DB-2F0B-4607-804E-0754F6413E9F}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{2BCDC9DB-2F0B-4607-804E-0754F6413E9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2BCDC9DB-2F0B-4607-804E-0754F6413E9F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2BCDC9DB-2F0B-4607-804E-0754F6413E9F}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
