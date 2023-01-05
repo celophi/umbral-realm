@@ -23,6 +23,6 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore UmbralRealm.sln
     - name: Build
-      run: dotnet build --no-restore UmbralRealm.sln
+      run: dotnet build --configuration Release --no-restore UmbralRealm.sln
     - name: Test
-      run: dotnet test --no-build --verbosity normal UmbralRealm.sln
+      run: dotnet test --no-build --verbosity normal --configuration Release UmbralRealm.sln
