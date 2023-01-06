@@ -8,11 +8,6 @@ namespace UmbralRealm.Proxy
     public class SocketConnection : ISocketConnection
     {
         /// <summary>
-        /// Uniquely identifies the connection.
-        /// </summary>
-        public readonly Guid Id = Guid.NewGuid();
-
-        /// <summary>
         /// Underlying socket to a client.
         /// </summary>
         private readonly SocketWrapper _socketAdapter;

@@ -30,6 +30,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UmbralRealm.Archiver", "Pro
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "UmbralRealm.Database", "Projects\UmbralRealm.Database\UmbralRealm.Database.sqlproj", "{2BCDC9DB-2F0B-4607-804E-0754F6413E9F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbralRealm.Login.Service", "Projects\UmbralRealm.Login.Service\UmbralRealm.Login.Service.csproj", "{178AFDD7-FAC4-4398-BB87-D9BD3E5B2389}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -73,6 +75,10 @@ Global
 		{2BCDC9DB-2F0B-4607-804E-0754F6413E9F}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{2BCDC9DB-2F0B-4607-804E-0754F6413E9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2BCDC9DB-2F0B-4607-804E-0754F6413E9F}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{178AFDD7-FAC4-4398-BB87-D9BD3E5B2389}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{178AFDD7-FAC4-4398-BB87-D9BD3E5B2389}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{178AFDD7-FAC4-4398-BB87-D9BD3E5B2389}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{178AFDD7-FAC4-4398-BB87-D9BD3E5B2389}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -87,6 +93,7 @@ Global
 		{1BA0C7DA-9FAB-40B9-A783-323A73FB9683} = {45E3CC49-8622-4979-92BC-C42009C06E8E}
 		{4BD2877C-780D-494A-AF0C-64EA1FA04AAB} = {ED49CE50-7281-4837-92DE-37E42FB10B0B}
 		{2BCDC9DB-2F0B-4607-804E-0754F6413E9F} = {ED49CE50-7281-4837-92DE-37E42FB10B0B}
+		{178AFDD7-FAC4-4398-BB87-D9BD3E5B2389} = {ED49CE50-7281-4837-92DE-37E42FB10B0B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B54FABAF-44EC-4CAF-96E0-D00F6DDC82C4}
