@@ -5,6 +5,11 @@ namespace UmbralRealm.Core.Network.Interfaces
     public interface IWriteConnection
     {
         /// <summary>
+        /// Uniquely identifies this connection.
+        /// </summary>
+        Guid Id { get; }
+
+        /// <summary>
         /// Returns 'true' if the underlying socket is connected.
         /// </summary>
         bool IsConnected { get; }

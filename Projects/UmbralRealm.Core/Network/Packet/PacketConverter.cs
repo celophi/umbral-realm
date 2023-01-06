@@ -3,7 +3,6 @@ using UmbralRealm.Core.IO;
 using UmbralRealm.Core.Network.Packet.Interfaces;
 using UmbralRealm.Core.Network.Packet.Model.Generic;
 using UmbralRealm.Core.Security.Interfaces;
-using UmbralRealm.Core.Utilities;
 
 namespace UmbralRealm.Core.Network.Packet
 {
@@ -14,15 +13,9 @@ namespace UmbralRealm.Core.Network.Packet
     {
         private readonly OpcodeMapping _opcodeMapping;
 
-        /// <summary>
-        /// Used for wrapping reflection capabilities.
-        /// </summary>
-        private readonly ActivatorWrapper _activator;
-
-        public PacketConverter(OpcodeMapping opcodeMapping, ActivatorWrapper activator)
+        public PacketConverter(OpcodeMapping opcodeMapping)
         {
             _opcodeMapping = opcodeMapping ?? throw new ArgumentNullException(nameof(opcodeMapping));
-            _activator = activator ?? throw new ArgumentNullException(nameof(activator));
         }
 
         /// <inheritdoc/>

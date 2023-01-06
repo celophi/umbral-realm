@@ -76,8 +76,7 @@ namespace UmbralRealm.Proxy
                     
                     var certificate = NetworkCertificate.CreatePrivateAsync().Result;
 
-                    var activator = new ActivatorWrapper();
-                    var packetFactory = new PacketConverter(loginOpcodeMapping, activator);
+                    var packetFactory = new PacketConverter(loginOpcodeMapping);
                     var connectionFactory = new ConnectionFactory(packetFactory);
 
                     var server = new LoginServer(socketFactory, endpoint, certificate, connectionFactory);
@@ -168,10 +167,9 @@ namespace UmbralRealm.Proxy
 
             var certificate = NetworkCertificate.CreatePrivateAsync().Result;
 
-            var activator = new ActivatorWrapper();
             var worldOpcodeMapping = OpcodeMapping.Create(new World.Packet.PacketOpcode());
 
-            var packetFactory = new PacketConverter(worldOpcodeMapping, activator);
+            var packetFactory = new PacketConverter(worldOpcodeMapping);
             var connectionFactory = new ConnectionFactory(packetFactory);
 
             var server = new WorldServer(socketFactory, endpoint, certificate, connectionFactory);
@@ -189,9 +187,8 @@ namespace UmbralRealm.Proxy
                 _realWorldIp = worldConnectionPacket.WorldIPAddress;
                 _realWorldPort = worldConnectionPacket.WorldIPPort;
 
-                var activator = new ActivatorWrapper();
                 var worldOpcodeMapping = OpcodeMapping.Create(new World.Packet.PacketOpcode());
-                var packetFactory = new PacketConverter(worldOpcodeMapping, activator);
+                var packetFactory = new PacketConverter(worldOpcodeMapping);
                 var connectionFactory = new ConnectionFactory(packetFactory);
 
                 // proxy

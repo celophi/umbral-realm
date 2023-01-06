@@ -12,6 +12,11 @@ namespace UmbralRealm.Core.Network
         private readonly IPacketConverter _packetFactory;
 
         /// <summary>
+        /// Uniquely identifies the connection.
+        /// </summary>
+        public Guid Id { get; private set; }
+
+        /// <summary>
         /// Packet queue of requests to be read by the server.
         /// </summary>
         private readonly ConcurrentQueue<IPacket> _requests = new();
@@ -21,6 +26,8 @@ namespace UmbralRealm.Core.Network
             _connection = connection ?? throw new ArgumentNullException(nameof(connection));
             _cipher = cipher ?? throw new ArgumentNullException(nameof(cipher));
             _packetFactory = packetFactory ?? throw new ArgumentNullException(nameof(packetFactory));
+
+            this.Id = Guid.NewGuid();
         }
 
         /// <inheritdoc/>
