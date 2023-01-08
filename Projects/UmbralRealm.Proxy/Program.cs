@@ -10,9 +10,7 @@ using UmbralRealm.Core.Network.Packet;
 using UmbralRealm.Core.Network.Packet.Interfaces;
 using UmbralRealm.Core.Network.Packet.Model.Generic;
 using UmbralRealm.Core.Security;
-using UmbralRealm.Core.Utilities;
 using UmbralRealm.Login.Packet.Server;
-using UmbralRealm.World.Packet.Server;
 
 namespace UmbralRealm.Proxy
 {
@@ -24,8 +22,8 @@ namespace UmbralRealm.Proxy
         /// </summary>
         private class LoginServer : SocketServer
         {
-            public LoginServer(SocketWrapperFactory socketFactory, IPEndPoint endPoint, NetworkCertificate certificate, IConnectionFactory connectionFactory) 
-                : base(socketFactory, endPoint, certificate, connectionFactory) { }
+            public LoginServer(SocketWrapperFactory socketFactory, IPEndPoint endPoint, NetworkCertificate certificate, IConnectionFactory connectionFactory, IConnectionMediator connectionMediator) 
+                : base(socketFactory, endPoint, certificate, connectionFactory, connectionMediator) { }
         }
 
         /// <summary>
@@ -34,8 +32,8 @@ namespace UmbralRealm.Proxy
         /// </summary>
         private class WorldServer : SocketServer
         {
-            public WorldServer(SocketWrapperFactory socketFactory, IPEndPoint endPoint, NetworkCertificate certificate, IConnectionFactory connectionFactory)
-                : base(socketFactory, endPoint, certificate, connectionFactory) { }
+            public WorldServer(SocketWrapperFactory socketFactory, IPEndPoint endPoint, NetworkCertificate certificate, IConnectionFactory connectionFactory, IConnectionMediator connectionMediator)
+                : base(socketFactory, endPoint, certificate, connectionFactory, connectionMediator) { }
         }
 
 
@@ -79,7 +77,9 @@ namespace UmbralRealm.Proxy
                     var packetFactory = new PacketConverter(loginOpcodeMapping);
                     var connectionFactory = new ConnectionFactory(packetFactory);
 
-                    var server = new LoginServer(socketFactory, endpoint, certificate, connectionFactory);
+                    var connectionMediator = new ConnectionMediator();
+
+                    var server = new LoginServer(socketFactory, endpoint, certificate, connectionFactory, connectionMediator);
 
                     // Setup proxy
 
@@ -87,13 +87,12 @@ namespace UmbralRealm.Proxy
                     ArgumentNullException.ThrowIfNull(remoteOptions);
                     var remoteEndpoint = Program.ParseEndpoint(remoteOptions);
 
-                    var proxy = new SocketClient(socketFactory, remoteEndpoint, requestQueue, connectionFactory);
+                    var proxy = new SocketClient(socketFactory, remoteEndpoint, connectionFactory);
 
                     proxy.Subscribe(packetQueue.AsObserver());
                     proxy.PacketReceivedHandler = StartWorldProxy;
 
-                    server.Subscribe(requestQueue.AsObserver());
-                    server.Subscribe(responseQueue.AsObserver());
+                    connectionMediator.Subscribe(proxy);
 
                     services.AddHostedService(provider => server);
 
@@ -102,7 +101,9 @@ namespace UmbralRealm.Proxy
                     ArgumentNullException.ThrowIfNull(worldOptions);
                     var worldEndpoint = Program.ParseEndpoint(worldOptions);
 
-                    _worldServer = Program.CreateSocketServer(worldEndpoint, ServerType.World, worldRequestQueue, worldResponseQueue);
+                    _worldConnectionMediator = new ConnectionMediator();
+
+                    _worldServer = Program.CreateSocketServer(worldEndpoint, _worldConnectionMediator);
 
                     services.AddHostedService(provider => _worldServer);
                 })
@@ -115,6 +116,7 @@ namespace UmbralRealm.Proxy
         }
 
         private static WorldServer _worldServer;
+        private static ConnectionMediator _worldConnectionMediator;
 
         /// <summary>
         /// Parse the options to return a useable endpoint.
@@ -161,7 +163,7 @@ namespace UmbralRealm.Proxy
             Console.WriteLine();
         }
 
-        private static WorldServer CreateSocketServer(IPEndPoint endpoint, ServerType serverType, BufferBlock<IWriteConnection> requestQueue, BufferBlock<IWriteConnection> responseQueue)
+        private static WorldServer CreateSocketServer(IPEndPoint endpoint, IConnectionMediator connectionMediator)
         {
             var socketFactory = new SocketWrapperFactory();
 
@@ -172,12 +174,7 @@ namespace UmbralRealm.Proxy
             var packetFactory = new PacketConverter(worldOpcodeMapping);
             var connectionFactory = new ConnectionFactory(packetFactory);
 
-            var server = new WorldServer(socketFactory, endpoint, certificate, connectionFactory);
-
-            server.Subscribe(requestQueue.AsObserver());
-            server.Subscribe(responseQueue.AsObserver());
-
-            return server;
+            return new WorldServer(socketFactory, endpoint, certificate, connectionFactory, connectionMediator);
         }
 
         private static void StartWorldProxy(IPacket packet, IWriteConnection client)
@@ -200,10 +197,11 @@ namespace UmbralRealm.Proxy
 
                 packetQueue.LinkTo(new ActionBlock<IPacket>(packet => HandlePacket(packet, worldOpcodeMapping)));
 
-                var proxy = new SocketClient(socketConnectionFactory, remoteEndpoint, worldRequestQueue, connectionFactory);
+                var proxy = new SocketClient(socketConnectionFactory, remoteEndpoint, connectionFactory);
                 proxy.PacketReceivedHandler = InjectRealWorldConnection;
 
                 proxy.Subscribe(packetQueue.AsObserver());
+                _worldConnectionMediator.Subscribe(proxy);
 
                 worldConnectionPacket.WorldIPAddress = BitConverter.ToUInt32(_worldServer.EndPoint.Address.GetAddressBytes(), 0);
                 worldConnectionPacket.WorldIPPort = (ushort)_worldServer.EndPoint.Port;

@@ -11,7 +11,7 @@ using UmbralRealm.Core.Security;
 
 namespace UmbralRealm.Proxy
 {
-    public class SocketClient
+    public class SocketClient : IConnectionSubscriber
     {
         /// <summary>
         /// Server connection to read packets from and forward to the client.
@@ -37,16 +37,13 @@ namespace UmbralRealm.Proxy
 
         private IConnectionFactory _connectionFactory;
 
-        public SocketClient(SocketWrapperFactory socketFactory, IPEndPoint endpoint, BufferBlock<IWriteConnection> requestQueue, IConnectionFactory connectionFactory)
+        public SocketClient(SocketWrapperFactory socketFactory, IPEndPoint endpoint, IConnectionFactory connectionFactory)
         {
             _socketFactory = socketFactory ?? throw new ArgumentNullException(nameof(socketFactory));
             _endpoint = endpoint ?? throw new ArgumentNullException(nameof(endpoint));
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
 
-            _packetQueue = new BufferBlock<IPacket>();
-
-
-            requestQueue.LinkTo(this.CreateActionBlock<IWriteConnection>(this.HandleConnection));
+            _packetQueue = new BufferBlock<IPacket>();            
             
             _clientTransmitQueue.LinkTo(this.CreateActionBlock<IWriteConnection>(this.TransmitClientPackets));
             _serverTransmitQueue.LinkTo(this.CreateActionBlock<IReadWriteConnection>(this.TransmitServerPackets));

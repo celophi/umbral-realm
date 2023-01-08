@@ -43,9 +43,9 @@ namespace UmbralRealm.Core.Network
         private readonly BufferBlock<ISocketConnection> _unverifiedBuffer = new();
 
         /// <summary>
-        /// Buffer holding connections that allows observers to subscribe.
+        /// Used for publishing validated connections to subscribers.
         /// </summary>
-        private readonly BufferBlock<IWriteConnection> _connectionServiceBuffer = new();
+        private readonly IConnectionMediator _connectionMediator;
 
         /// <summary>
         /// Creates a TCP server that can accept client connections.
@@ -54,12 +54,13 @@ namespace UmbralRealm.Core.Network
         /// <param name="endPoint"></param>
         /// <param name="certificate"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public SocketServer(SocketWrapperFactory socketFactory, IPEndPoint endPoint, NetworkCertificate certificate, IConnectionFactory connectionFactory)
+        public SocketServer(SocketWrapperFactory socketFactory, IPEndPoint endPoint, NetworkCertificate certificate, IConnectionFactory connectionFactory, IConnectionMediator connectionMediator)
         {
             _socketFactory = socketFactory ?? throw new ArgumentNullException(nameof(socketFactory));
             this.EndPoint = endPoint ?? throw new ArgumentNullException(nameof(endPoint));
             _certificate = certificate ?? throw new ArgumentNullException(nameof(certificate));
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
+            _connectionMediator = connectionMediator ?? throw new ArgumentNullException(nameof(connectionMediator));
         }
 
         /// <summary>
@@ -124,21 +125,6 @@ namespace UmbralRealm.Core.Network
         }
 
         /// <summary>
-        /// Subscribes an observer to the connection buffer.
-        /// </summary>
-        /// <param name="observer"></param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public void Subscribe(IObserver<IWriteConnection> observer)
-        {
-            if (observer == null)
-            {
-                throw new ArgumentNullException(nameof(observer));
-            }
-
-            _connectionServiceBuffer.AsObservable().Subscribe(observer);
-        }
-
-        /// <summary>
         /// Sends the network certificate to each connected client for authentication.
         /// </summary>
         /// <param name="socketConnection"></param>
@@ -193,7 +179,7 @@ namespace UmbralRealm.Core.Network
                 var cipher = NetworkCipher.Create(secret);
 
                 var connection = _connectionFactory.Create(socketConnection, cipher);
-                await _connectionServiceBuffer.SendAsync(connection);
+                await _connectionMediator.Publish(connection);
 
                 return connection;
             }

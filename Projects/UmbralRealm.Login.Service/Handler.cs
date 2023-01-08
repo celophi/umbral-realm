@@ -12,17 +12,14 @@ using UmbralRealm.Login.Packet.Server;
 
 namespace UmbralRealm.Login.Service
 {
-    public class Handler
+    public class Handler : IConnectionSubscriber
     {
-        private BufferBlock<IWriteConnection> _requestQueue;
+        private BufferBlock<IWriteConnection> _requestQueue = new BufferBlock<IWriteConnection>();
 
         private Dictionary<Guid, LoginState> _loginStatuses = new();
 
-        public Handler(BufferBlock<IWriteConnection> requestQueue)
+        public Handler()
         {
-            _requestQueue = requestQueue ?? throw new ArgumentNullException(nameof(requestQueue));
-
-
             _requestQueue.LinkTo(this.CreateActionBlock<IWriteConnection>(this.HandleConnection));
         }
 
