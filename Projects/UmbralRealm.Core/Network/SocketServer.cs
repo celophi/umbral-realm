@@ -16,12 +16,12 @@ namespace UmbralRealm.Core.Network
         /// <summary>
         /// Used for creating sockets.
         /// </summary>
-        private readonly SocketWrapperFactory _socketFactory;
+        private readonly ISocketFactory _socketFactory;
 
         /// <summary>
         /// Socket instance for accepting client connections.
         /// </summary>
-        private SocketWrapper _listener;
+        private SocketWrapper? _listener;
 
         /// <summary>
         /// Server RSA certificate for encrypting secrets and establishing a secure channel.
@@ -50,7 +50,7 @@ namespace UmbralRealm.Core.Network
         /// <param name="endPoint"></param>
         /// <param name="certificate"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public SocketServer(SocketWrapperFactory socketFactory, NetworkCertificate certificate, IConnectionFactory connectionFactory, IDataMediator<IWriteConnection> connectionMediator)
+        public SocketServer(ISocketFactory socketFactory, NetworkCertificate certificate, IConnectionFactory connectionFactory, IDataMediator<IWriteConnection> connectionMediator)
         {
             _socketFactory = socketFactory ?? throw new ArgumentNullException(nameof(socketFactory));
             _certificate = certificate ?? throw new ArgumentNullException(nameof(certificate));
@@ -89,7 +89,7 @@ namespace UmbralRealm.Core.Network
         public override async Task StopAsync(CancellationToken cancellationToken)
         {
             // Listening sockets do not need to disconnect or shutdown.
-            _listener.Close();
+            _listener?.Close();
             await base.StopAsync(cancellationToken);
         }
 
@@ -100,7 +100,7 @@ namespace UmbralRealm.Core.Network
         /// <returns></returns>
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while (!stoppingToken.IsCancellationRequested)
+            while (!stoppingToken.IsCancellationRequested && _listener != null)
             {
                 var socket = await _listener.AcceptAsync(stoppingToken);
                 if (socket == null)

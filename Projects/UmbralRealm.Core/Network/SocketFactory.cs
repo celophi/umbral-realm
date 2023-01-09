@@ -1,18 +1,31 @@
 ﻿using System.Net;
 using System.Net.Sockets;
+using UmbralRealm.Core.Network.Interfaces;
 using UmbralRealm.Core.Utilities;
 
 namespace UmbralRealm.Core.Network
 {
-    public class SocketWrapperFactory
+    /// <summary>
+    /// Factory for creating sockets for specific purposes.
+    /// </summary>
+    public class SocketFactory : ISocketFactory
     {
+        /// <summary>
+        /// IP address and port combination.
+        /// </summary>
         private readonly IPEndPoint _endPoint;
 
-        public SocketWrapperFactory(IPEndPoint endpoint)
+        /// <summary>
+        /// Creates a factory that can create instances of wrapped sockets.
+        /// </summary>
+        /// <param name="endpoint"></param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public SocketFactory(IPEndPoint endpoint)
         {
             _endPoint = endpoint ?? throw new ArgumentNullException(nameof(endpoint));
         }
 
+        /// <inheritdoc/>
         public SocketWrapper CreateListeningSocket()
         {
             var socket = this.CreateDefaultSocket();
@@ -21,6 +34,7 @@ namespace UmbralRealm.Core.Network
             return socket;
         }
 
+        /// <inheritdoc/>
         public SocketWrapper CreateConnectedSocket()
         {
             var socket = this.CreateDefaultSocket();

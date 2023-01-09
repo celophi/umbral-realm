@@ -11,7 +11,7 @@ namespace UmbralRealm.Proxy
 {
     public class SocketClient : IDataSubscriber<IWriteConnection>
     {
-        private readonly SocketWrapperFactory _socketFactory;
+        private readonly ISocketFactory _socketFactory;
 
         private IConnectionFactory _connectionFactory;
 
@@ -19,7 +19,7 @@ namespace UmbralRealm.Proxy
 
         private readonly IDataMediator<IPacket> _packetMediator;
 
-        public SocketClient(SocketWrapperFactory socketFactory, IConnectionFactory connectionFactory, IDataMediator<IPacket> packetMediator)
+        public SocketClient(ISocketFactory socketFactory, IConnectionFactory connectionFactory, IDataMediator<IPacket> packetMediator)
         {
             _socketFactory = socketFactory ?? throw new ArgumentNullException(nameof(socketFactory));
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));

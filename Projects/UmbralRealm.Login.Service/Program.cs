@@ -30,7 +30,7 @@ namespace UmbralRealm.Login.Service
                     var loginOptions = configuration.GetSection("LocalLoginEndpoint").Get<EndpointOptions>();
                     ArgumentNullException.ThrowIfNull(loginOptions);
                     var endpoint = Program.ParseEndpoint(loginOptions);
-                    var socketFactory = new SocketWrapperFactory(endpoint);
+                    var socketFactory = new SocketFactory(endpoint);
 
 
                     var certificate = NetworkCertificate.CreatePrivateAsync().Result;
