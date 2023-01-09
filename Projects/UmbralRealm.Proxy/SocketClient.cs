@@ -1,5 +1,4 @@
-﻿using System.Net;
-using UmbralRealm.Core.IO;
+﻿using UmbralRealm.Core.IO;
 using UmbralRealm.Core.Network;
 using UmbralRealm.Core.Network.Interfaces;
 using UmbralRealm.Core.Network.Packet;
@@ -14,18 +13,15 @@ namespace UmbralRealm.Proxy
     {
         private readonly SocketWrapperFactory _socketFactory;
 
-        private readonly IPEndPoint _endpoint;
-
         private IConnectionFactory _connectionFactory;
 
         private CancellationTokenSource? _cts;
 
         private readonly IDataMediator<IPacket> _packetMediator;
 
-        public SocketClient(SocketWrapperFactory socketFactory, IPEndPoint endpoint, IConnectionFactory connectionFactory, IDataMediator<IPacket> packetMediator)
+        public SocketClient(SocketWrapperFactory socketFactory, IConnectionFactory connectionFactory, IDataMediator<IPacket> packetMediator)
         {
             _socketFactory = socketFactory ?? throw new ArgumentNullException(nameof(socketFactory));
-            _endpoint = endpoint ?? throw new ArgumentNullException(nameof(endpoint));
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
             _packetMediator = packetMediator ?? throw new ArgumentNullException(nameof(packetMediator));
         }
@@ -40,10 +36,7 @@ namespace UmbralRealm.Proxy
             _cts?.Cancel();
             _cts = new();
 
-            var serverSocket = _socketFactory.Create();
-            serverSocket.Connect(_endpoint);
-
-            var remoteConnection = new SocketConnection(serverSocket);
+            var remoteConnection = new SocketConnection(_socketFactory.CreateConnectedSocket());
 
             // Receive the RSA public key.
             var buffer = await remoteConnection.ReceiveAsync(RsaCertificatePacket.FixedSize);

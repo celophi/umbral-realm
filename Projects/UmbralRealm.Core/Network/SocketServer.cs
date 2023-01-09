@@ -24,11 +24,6 @@ namespace UmbralRealm.Core.Network
         private SocketWrapper _listener;
 
         /// <summary>
-        /// Socket endpoint for listening for connections.
-        /// </summary>
-        public readonly IPEndPoint EndPoint;
-
-        /// <summary>
         /// Server RSA certificate for encrypting secrets and establishing a secure channel.
         /// </summary>
         private readonly NetworkCertificate _certificate;
@@ -55,10 +50,9 @@ namespace UmbralRealm.Core.Network
         /// <param name="endPoint"></param>
         /// <param name="certificate"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public SocketServer(SocketWrapperFactory socketFactory, IPEndPoint endPoint, NetworkCertificate certificate, IConnectionFactory connectionFactory, IDataMediator<IWriteConnection> connectionMediator)
+        public SocketServer(SocketWrapperFactory socketFactory, NetworkCertificate certificate, IConnectionFactory connectionFactory, IDataMediator<IWriteConnection> connectionMediator)
         {
             _socketFactory = socketFactory ?? throw new ArgumentNullException(nameof(socketFactory));
-            this.EndPoint = endPoint ?? throw new ArgumentNullException(nameof(endPoint));
             _certificate = certificate ?? throw new ArgumentNullException(nameof(certificate));
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
             _connectionMediator = connectionMediator ?? throw new ArgumentNullException(nameof(connectionMediator));
@@ -71,9 +65,7 @@ namespace UmbralRealm.Core.Network
         /// <returns></returns>
         public override async Task StartAsync(CancellationToken cancellationToken)
         {
-            _listener = _socketFactory.Create();
-            _listener.Bind(this.EndPoint);
-            _listener.Listen();
+            _listener = _socketFactory.CreateListeningSocket();
 
             var sendCertificateBlock = new TransformBlock<ISocketConnection?, ISocketConnection?>(async socketConnection => await this.SendCertificateAsync(socketConnection));
             var receiveSecretBlock = new TransformBlock<ISocketConnection?, IReadWriteConnection?>(async socketConnection => await this.ReceiveSecretAsync(socketConnection));

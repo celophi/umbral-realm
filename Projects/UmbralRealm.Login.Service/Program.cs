@@ -23,13 +23,14 @@ namespace UmbralRealm.Login.Service
             var host = new HostBuilder()
                 .ConfigureServices(services =>
                 {
-                    var socketFactory = new SocketWrapperFactory();
+                    
                     var loginOpcodeMapping = OpcodeMapping.Create(new Packet.PacketOpcode());
 
                     // Setup server
                     var loginOptions = configuration.GetSection("LocalLoginEndpoint").Get<EndpointOptions>();
                     ArgumentNullException.ThrowIfNull(loginOptions);
                     var endpoint = Program.ParseEndpoint(loginOptions);
+                    var socketFactory = new SocketWrapperFactory(endpoint);
 
 
                     var certificate = NetworkCertificate.CreatePrivateAsync().Result;
@@ -39,7 +40,7 @@ namespace UmbralRealm.Login.Service
 
                     var mediator = new BufferBlockMediator<IWriteConnection>();
 
-                    var server = new SocketServer(socketFactory, endpoint, certificate, connectionFactory, mediator);
+                    var server = new SocketServer(socketFactory, certificate, connectionFactory, mediator);
 
                     var handler = new Handler();
                     mediator.Subscribe(handler);
