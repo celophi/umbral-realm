@@ -6,27 +6,25 @@ using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using UmbralRealm.Core.Network.Interfaces;
 using UmbralRealm.Core.Network.Packet.Interfaces;
+using UmbralRealm.Core.Utilities.Interfaces;
 using UmbralRealm.Login.Data;
 using UmbralRealm.Login.Packet.Client;
 using UmbralRealm.Login.Packet.Server;
 
 namespace UmbralRealm.Login.Service
 {
-    public class Handler
+    public class Handler : IDataSubscriber<IWriteConnection>
     {
-        private BufferBlock<IWriteConnection> _requestQueue;
+        private BufferBlock<IWriteConnection> _requestQueue = new BufferBlock<IWriteConnection>();
 
         private Dictionary<Guid, LoginState> _loginStatuses = new();
 
-        public Handler(BufferBlock<IWriteConnection> requestQueue)
+        public Handler()
         {
-            _requestQueue = requestQueue ?? throw new ArgumentNullException(nameof(requestQueue));
-
-
-            _requestQueue.LinkTo(this.CreateActionBlock<IWriteConnection>(this.HandleConnection));
+            _requestQueue.LinkTo(this.CreateActionBlock<IWriteConnection>(this.Handle));
         }
 
-        public async Task HandleConnection(IWriteConnection connection)
+        public async Task Handle(IWriteConnection connection)
         {
             if (connection?.IsConnected != true)
             {

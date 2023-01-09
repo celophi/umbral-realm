@@ -1,67 +1,41 @@
-﻿using System.Net;
-using System.Net.Sockets;
-using System.Threading.Tasks.Dataflow;
-using UmbralRealm.Core.IO;
-using UmbralRealm.Core.Network;
+﻿using UmbralRealm.Core.IO;
 using UmbralRealm.Core.Network.Interfaces;
 using UmbralRealm.Core.Network.Packet;
 using UmbralRealm.Core.Network.Packet.Interfaces;
 using UmbralRealm.Core.Network.Packet.Model.Generic;
 using UmbralRealm.Core.Security;
+using UmbralRealm.Core.Utilities.Interfaces;
 
 namespace UmbralRealm.Proxy
 {
-    public class SocketClient
+    public class SocketClient : IDataSubscriber<IWriteConnection>
     {
-        /// <summary>
-        /// Server connection to read packets from and forward to the client.
-        /// </summary>
-        private IReadWriteConnection _server;
-
-        /// <summary>
-        /// Client connection to read packets from and forward to the server.
-        /// </summary>
-        private IWriteConnection _client;
-
-
-
-        private readonly SocketWrapperFactory _socketFactory;
-
-        private readonly IPEndPoint _endpoint;
-
-
-        private BufferBlock<IWriteConnection> _clientTransmitQueue = new();
-        private BufferBlock<IReadWriteConnection> _serverTransmitQueue = new();
-
-        private BufferBlock<IPacket> _packetQueue;
+        private readonly ISocketFactory _socketFactory;
 
         private IConnectionFactory _connectionFactory;
 
-        public SocketClient(SocketWrapperFactory socketFactory, IPEndPoint endpoint, BufferBlock<IWriteConnection> requestQueue, IConnectionFactory connectionFactory)
+        private CancellationTokenSource? _cts;
+
+        private readonly IDataMediator<IPacket> _packetMediator;
+
+        public SocketClient(ISocketFactory socketFactory, IConnectionFactory connectionFactory, IDataMediator<IPacket> packetMediator)
         {
             _socketFactory = socketFactory ?? throw new ArgumentNullException(nameof(socketFactory));
-            _endpoint = endpoint ?? throw new ArgumentNullException(nameof(endpoint));
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
-
-            _packetQueue = new BufferBlock<IPacket>();
-
-
-            requestQueue.LinkTo(this.CreateActionBlock<IWriteConnection>(this.HandleConnection));
-            
-            _clientTransmitQueue.LinkTo(this.CreateActionBlock<IWriteConnection>(this.TransmitClientPackets));
-            _serverTransmitQueue.LinkTo(this.CreateActionBlock<IReadWriteConnection>(this.TransmitServerPackets));
+            _packetMediator = packetMediator ?? throw new ArgumentNullException(nameof(packetMediator));
         }
 
-        public async Task HandleConnection(IWriteConnection connection)
+        /// <summary>
+        /// Used for synchronously starting another proxy.
+        /// </summary>
+        public Action<IPacket, IWriteConnection> PacketReceivedHandler;
+
+        public async Task Handle(IWriteConnection connection)
         {
-            _client?.Disconnect();
-            _server?.Disconnect();
+            _cts?.Cancel();
+            _cts = new();
 
-            var server = _socketFactory.Create();
-
-            server.Connect(_endpoint);
-
-            var remoteConnection = new SocketConnection(server);
+            var remoteConnection = new SocketConnection(_socketFactory.CreateConnectedSocket());
 
             // Receive the RSA public key.
             var buffer = await remoteConnection.ReceiveAsync(RsaCertificatePacket.FixedSize);
@@ -81,112 +55,48 @@ namespace UmbralRealm.Proxy
             await remoteConnection.SendAsync(payload);
 
             var cipher = NetworkCipher.Create(cipherKey);
+            var server = _connectionFactory.Create(remoteConnection, cipher);
 
-            var serverConnection = _connectionFactory.Create(remoteConnection, cipher);
-
-            _client = connection;
-            _server = serverConnection;
-
-            await _clientTransmitQueue.SendAsync(_client);
-            await _serverTransmitQueue.SendAsync(_server);
+            _ = Task.Run(async () => await this.Transmit(server, connection, PacketOrigin.Client, _cts.Token));
+            _ = Task.Run(async () => await this.Transmit(server, connection, PacketOrigin.Server, _cts.Token));
         }
 
-        public async Task TransmitClientPackets(IWriteConnection client)
+        private async Task Transmit(IReadWriteConnection server, IWriteConnection connection, PacketOrigin origin, CancellationToken cancellationToken)
         {
-            if (_client?.IsConnected != true)
-            {
-                _server.Disconnect();
-                return;
-            }
+            var sender = origin == PacketOrigin.Server ? server : connection;
+            var receiver = origin == PacketOrigin.Server ? connection : server;
 
-            while ((_server?.IsConnected == true) && _client.TryGetPacket(out var packet))
+            while (!cancellationToken.IsCancellationRequested)
             {
-                if (packet is UnknownPacket unknownPacket)
+                if (connection?.IsConnected != true)
                 {
-                    unknownPacket.Origin = PacketOrigin.Client;
+                    server.Disconnect();
+                    return;
                 }
 
-                if (this.PacketReceivedHandler != null)
+                if (server?.IsConnected != true)
                 {
-                    this.PacketReceivedHandler(packet, _client);
+                    connection.Disconnect();
+                    return;
                 }
 
-                await _packetQueue.SendAsync(packet);
-                await _server.SendAsync(packet);
-            }
-
-            await _clientTransmitQueue.SendAsync(_client);
-        }
-
-        public async Task TransmitServerPackets(IReadWriteConnection server)
-        {
-            if (_client?.IsConnected != true)
-            {
-                server.Disconnect();
-                return;
-            }
-
-            if (server?.IsConnected == true)
-            {
-                await server.ReceiveAsync();
-            }
-
-            while (server?.TryGetPacket(out var packet) == true)
-            {
-                if (packet is UnknownPacket unknownPacket)
+                if (origin == PacketOrigin.Server)
                 {
-                    unknownPacket.Origin = PacketOrigin.Server;
+                    await server.ReceiveAsync();
                 }
 
-                if (this.PacketReceivedHandler != null)
+                while (sender.TryGetPacket(out var packet))
                 {
-                    this.PacketReceivedHandler(packet, _client);
+                    if (packet is UnknownPacket unknownPacket)
+                    {
+                        unknownPacket.Origin = origin;
+                    }
+
+                    this.PacketReceivedHandler?.Invoke(packet, connection);
+
+                    await _packetMediator.Publish(packet);
+                    await receiver.SendAsync(packet);
                 }
-
-                await _packetQueue.SendAsync(packet);
-                await _client.SendAsync(packet);
-            }
-
-            await _serverTransmitQueue.SendAsync(server);
-        }
-
-        /// <summary>
-        /// Subscribes an observer to the connection buffer.
-        /// </summary>
-        /// <param name="observer"></param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public void Subscribe(IObserver<IPacket> observer)
-        {
-            if (observer == null)
-            {
-                throw new ArgumentNullException(nameof(observer));
-            }
-
-            _packetQueue.AsObservable().Subscribe(observer);
-        }
-
-        /// <summary>
-        /// Used for synchronously starting another proxy.
-        /// </summary>
-        public Action<IPacket, IWriteConnection> PacketReceivedHandler;
-
-        /// <summary>
-        /// Used for creating TPL dataflow action blocks from function and wrapping them in an exception handler.
-        /// Dataflow blocks cannot be used if an exception happens.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="func"></param>
-        /// <returns></returns>
-        private ActionBlock<T> CreateActionBlock<T>(Func<T, Task> func)
-        {
-            try
-            {
-                return new ActionBlock<T>(func);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                throw;
             }
         }
     }

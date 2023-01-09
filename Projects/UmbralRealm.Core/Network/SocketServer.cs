@@ -1,32 +1,13 @@
-﻿using System.Net;
-using System.Net.Sockets;
-using System.Threading.Tasks.Dataflow;
-using Microsoft.Extensions.Hosting;
+﻿using System.Threading.Tasks.Dataflow;
 using UmbralRealm.Core.Network.Interfaces;
 using UmbralRealm.Core.Network.Packet.Model.Generic;
 using UmbralRealm.Core.Security;
-using UmbralRealm.Core.Utilities;
-using UmbralRealm.Proxy;
+using UmbralRealm.Core.Utilities.Interfaces;
 
 namespace UmbralRealm.Core.Network
 {
-    public class SocketServer : BackgroundService
+    public class SocketServer : IDataSubscriber<ISocketConnection>
     {
-        /// <summary>
-        /// Used for creating sockets.
-        /// </summary>
-        private readonly SocketWrapperFactory _socketFactory;
-
-        /// <summary>
-        /// Socket instance for accepting client connections.
-        /// </summary>
-        private SocketWrapper _listener;
-
-        /// <summary>
-        /// Socket endpoint for listening for connections.
-        /// </summary>
-        public readonly IPEndPoint EndPoint;
-
         /// <summary>
         /// Server RSA certificate for encrypting secrets and establishing a secure channel.
         /// </summary>
@@ -38,105 +19,37 @@ namespace UmbralRealm.Core.Network
         private readonly IConnectionFactory _connectionFactory;
 
         /// <summary>
-        /// Buffer holding connections that need to be authenticated.
+        /// Used for publishing validated connections to subscribers.
         /// </summary>
-        private readonly BufferBlock<ISocketConnection> _unverifiedBuffer = new();
+        private readonly IDataMediator<IWriteConnection> _connectionMediator;
 
-        /// <summary>
-        /// Buffer holding connections that allows observers to subscribe.
-        /// </summary>
-        private readonly BufferBlock<IWriteConnection> _connectionServiceBuffer = new();
+        private readonly TransformBlock<ISocketConnection?, ISocketConnection?> _sendCertificateBlock;
 
         /// <summary>
         /// Creates a TCP server that can accept client connections.
         /// </summary>
-        /// <param name="socketFactory"></param>
-        /// <param name="endPoint"></param>
         /// <param name="certificate"></param>
+        /// <param name="connectionFactory"></param>
+        /// <param name="connectionMediator"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public SocketServer(SocketWrapperFactory socketFactory, IPEndPoint endPoint, NetworkCertificate certificate, IConnectionFactory connectionFactory)
+        public SocketServer(NetworkCertificate certificate, IConnectionFactory connectionFactory, IDataMediator<IWriteConnection> connectionMediator)
         {
-            _socketFactory = socketFactory ?? throw new ArgumentNullException(nameof(socketFactory));
-            this.EndPoint = endPoint ?? throw new ArgumentNullException(nameof(endPoint));
             _certificate = certificate ?? throw new ArgumentNullException(nameof(certificate));
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
-        }
+            _connectionMediator = connectionMediator ?? throw new ArgumentNullException(nameof(connectionMediator));
 
-        /// <summary>
-        /// Starts the server and prepares the listening socket and client queue.
-        /// </summary>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public override async Task StartAsync(CancellationToken cancellationToken)
-        {
-            _listener = _socketFactory.Create();
-            _listener.Bind(this.EndPoint);
-            _listener.Listen();
-
-            var sendCertificateBlock = new TransformBlock<ISocketConnection?, ISocketConnection?>(async socketConnection => await this.SendCertificateAsync(socketConnection));
+            _sendCertificateBlock = new TransformBlock<ISocketConnection?, ISocketConnection?>(async socketConnection => await this.SendCertificateAsync(socketConnection));
             var receiveSecretBlock = new TransformBlock<ISocketConnection?, IReadWriteConnection?>(async socketConnection => await this.ReceiveSecretAsync(socketConnection));
             var processRequestsBlock = new TransformBlock<IReadWriteConnection?, IReadWriteConnection?>(async connection => await this.ProcessRequestsAsync(connection));
 
             var linkOptions = new DataflowLinkOptions { PropagateCompletion = true };
 
-            _unverifiedBuffer.LinkTo(sendCertificateBlock, linkOptions, connection => connection != null);
-            sendCertificateBlock.LinkTo(receiveSecretBlock, linkOptions, connection => connection != null);
+            _sendCertificateBlock.LinkTo(receiveSecretBlock, linkOptions, connection => connection != null);
             receiveSecretBlock.LinkTo(processRequestsBlock, linkOptions, connection => connection != null);
             processRequestsBlock.LinkTo(processRequestsBlock, linkOptions, connection => connection != null);
-
-            await base.StartAsync(cancellationToken);
         }
 
-        /// <summary>
-        /// Stops the server and closes the listening socket.
-        /// </summary>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public override async Task StopAsync(CancellationToken cancellationToken)
-        {
-            // Listening sockets do not need to disconnect or shutdown.
-            _listener.Close();
-            await base.StopAsync(cancellationToken);
-        }
-
-        /// <summary>
-        /// Accepts incoming connections and places them on a queue to be processed.
-        /// </summary>
-        /// <param name="stoppingToken"></param>
-        /// <returns></returns>
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                var socket = await _listener.AcceptAsync(stoppingToken);
-                if (socket == null)
-                {
-                    await Task.Delay(1, stoppingToken);
-                    continue;
-                }
-
-                var socketAdapter = new SocketWrapper(socket);
-                var socketConnection = new SocketConnection(socketAdapter);
-                socketConnection.SetKeepAlive();
-
-                await _unverifiedBuffer.SendAsync(socketConnection);
-            }
-        }
-
-        /// <summary>
-        /// Subscribes an observer to the connection buffer.
-        /// </summary>
-        /// <param name="observer"></param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public void Subscribe(IObserver<IWriteConnection> observer)
-        {
-            if (observer == null)
-            {
-                throw new ArgumentNullException(nameof(observer));
-            }
-
-            _connectionServiceBuffer.AsObservable().Subscribe(observer);
-        }
+        public async Task Handle(ISocketConnection data) => await _sendCertificateBlock.SendAsync(data);
 
         /// <summary>
         /// Sends the network certificate to each connected client for authentication.
@@ -193,7 +106,7 @@ namespace UmbralRealm.Core.Network
                 var cipher = NetworkCipher.Create(secret);
 
                 var connection = _connectionFactory.Create(socketConnection, cipher);
-                await _connectionServiceBuffer.SendAsync(connection);
+                await _connectionMediator.Publish(connection);
 
                 return connection;
             }

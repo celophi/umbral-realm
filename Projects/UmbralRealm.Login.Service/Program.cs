@@ -7,6 +7,7 @@ using UmbralRealm.Core.Network;
 using UmbralRealm.Core.Network.Interfaces;
 using UmbralRealm.Core.Network.Packet;
 using UmbralRealm.Core.Security;
+using UmbralRealm.Core.Utilities;
 
 namespace UmbralRealm.Login.Service
 {
@@ -22,17 +23,14 @@ namespace UmbralRealm.Login.Service
             var host = new HostBuilder()
                 .ConfigureServices(services =>
                 {
-                    var socketFactory = new SocketWrapperFactory();
+                    
                     var loginOpcodeMapping = OpcodeMapping.Create(new Packet.PacketOpcode());
-
-                    // Setup queues
-                    var requestQueue = new BufferBlock<IWriteConnection>();
-                    var responseQueue = new BufferBlock<IWriteConnection>();
 
                     // Setup server
                     var loginOptions = configuration.GetSection("LocalLoginEndpoint").Get<EndpointOptions>();
                     ArgumentNullException.ThrowIfNull(loginOptions);
                     var endpoint = Program.ParseEndpoint(loginOptions);
+                    var socketFactory = new SocketFactory(endpoint);
 
 
                     var certificate = NetworkCertificate.CreatePrivateAsync().Result;
@@ -40,14 +38,18 @@ namespace UmbralRealm.Login.Service
                     var packetFactory = new PacketConverter(loginOpcodeMapping);
                     var connectionFactory = new ConnectionFactory(packetFactory);
 
-                    var server = new SocketServer(socketFactory, endpoint, certificate, connectionFactory);
+                    var mediator = new BufferBlockMediator<IWriteConnection>();
+                    var mediator2 = new BufferBlockMediator<ISocketConnection>();
 
-                    server.Subscribe(requestQueue.AsObserver());
+                    var listener = new SocketListener(socketFactory, mediator2);
+                    var server = new SocketServer(certificate, connectionFactory, mediator);
 
-                    var handler = new Handler(requestQueue);
+                    mediator2.Subscribe(server);
 
+                    var handler = new Handler();
+                    mediator.Subscribe(handler);
 
-                    services.AddHostedService(provider => server);
+                    services.AddHostedService(provider => listener);
                 })
                 .UseConsoleLifetime()
                 .Build();
