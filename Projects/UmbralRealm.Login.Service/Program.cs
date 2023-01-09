@@ -39,13 +39,17 @@ namespace UmbralRealm.Login.Service
                     var connectionFactory = new ConnectionFactory(packetFactory);
 
                     var mediator = new BufferBlockMediator<IWriteConnection>();
+                    var mediator2 = new BufferBlockMediator<ISocketConnection>();
 
-                    var server = new SocketServer(socketFactory, certificate, connectionFactory, mediator);
+                    var listener = new SocketListener(socketFactory, mediator2);
+                    var server = new SocketServer(certificate, connectionFactory, mediator);
+
+                    mediator2.Subscribe(server);
 
                     var handler = new Handler();
                     mediator.Subscribe(handler);
 
-                    services.AddHostedService(provider => server);
+                    services.AddHostedService(provider => listener);
                 })
                 .UseConsoleLifetime()
                 .Build();

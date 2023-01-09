@@ -20,20 +20,20 @@ namespace UmbralRealm.Proxy
         /// Proxy class because .NET has an issue with starting multiple hosted instances with the same type name.
         /// https://github.com/dotnet/runtime/issues/38751
         /// </summary>
-        private class LoginServer : SocketServer
+        private class LoginServer : SocketListener
         {
-            public LoginServer(SocketFactory socketFactory, NetworkCertificate certificate, IConnectionFactory connectionFactory, IDataMediator<IWriteConnection> connectionMediator)
-                : base(socketFactory, certificate, connectionFactory, connectionMediator) { }
+            public LoginServer(SocketFactory socketFactory, IDataMediator<ISocketConnection> connectionMediator)
+                : base(socketFactory, connectionMediator) { }
         }
 
         /// <summary>
         /// Proxy class because .NET has an issue with starting multiple hosted instances with the same type name.
         /// https://github.com/dotnet/runtime/issues/38751
         /// </summary>
-        private class WorldServer : SocketServer
+        private class WorldServer : SocketListener
         {
-            public WorldServer(SocketFactory socketFactory, NetworkCertificate certificate, IConnectionFactory connectionFactory, IDataMediator<IWriteConnection> connectionMediator)
-                : base(socketFactory, certificate, connectionFactory, connectionMediator) { }
+            public WorldServer(SocketFactory socketFactory, IDataMediator<ISocketConnection> connectionMediator)
+                : base(socketFactory, connectionMediator) { }
         }
 
         private static uint _realWorldIp;
@@ -67,9 +67,12 @@ namespace UmbralRealm.Proxy
                     var packetFactory = new PacketConverter(loginOpcodeMapping);
                     var connectionFactory = new ConnectionFactory(packetFactory);
 
-                    var connectionMediator = new BufferBlockMediator<IWriteConnection>();
+                    var connectionMediator = new BufferBlockMediator<ISocketConnection>();
+                    var connectionMediator2 = new BufferBlockMediator<IWriteConnection>();
 
-                    var server = new LoginServer(new SocketFactory(endpoint), certificate, connectionFactory, connectionMediator);
+                    var server = new SocketServer(certificate, connectionFactory, connectionMediator2);
+                    var listener = new LoginServer(new SocketFactory(endpoint), connectionMediator);
+                    connectionMediator.Subscribe(server);
 
                     // Setup proxy
 
@@ -80,9 +83,9 @@ namespace UmbralRealm.Proxy
                     var proxy = new SocketClient(new SocketFactory(remoteEndpoint), connectionFactory, packetMediator);
                     proxy.PacketReceivedHandler = StartWorldProxy;
 
-                    connectionMediator.Subscribe(proxy);
+                    connectionMediator2.Subscribe(proxy);
 
-                    services.AddHostedService(provider => server);
+                    services.AddHostedService(provider => listener);
 
                     // World
                     var worldOptions = configuration.GetSection(EndpointOptions.LocalWorldEndpoint).Get<EndpointOptions>();
@@ -103,8 +106,6 @@ namespace UmbralRealm.Proxy
             Console.WriteLine("Hello, World!");
         }
 
-
-
         /// <summary>
         /// Parse the options to return a useable endpoint.
         /// </summary>
@@ -116,7 +117,7 @@ namespace UmbralRealm.Proxy
             return new IPEndPoint(ipAddress, options.Port);
         }
 
-        private static WorldServer CreateSocketServer(IPEndPoint endpoint, IDataMediator<IWriteConnection> connectionMediator)
+        private static WorldServer CreateSocketServer(IPEndPoint endpoint, IDataMediator<IWriteConnection> connectionMediator2)
         {
             var socketFactory = new SocketFactory(endpoint);
 
@@ -127,7 +128,13 @@ namespace UmbralRealm.Proxy
             var packetFactory = new PacketConverter(worldOpcodeMapping);
             var connectionFactory = new ConnectionFactory(packetFactory);
 
-            return new WorldServer(socketFactory, certificate, connectionFactory, connectionMediator);
+            var connectionMediator = new BufferBlockMediator<ISocketConnection>();
+
+            var listener = new WorldServer(socketFactory, connectionMediator);
+            var server = new SocketServer(certificate, connectionFactory, connectionMediator2);
+            connectionMediator.Subscribe(server);
+
+            return listener;
         }
 
         private static void StartWorldProxy(IPacket packet, IWriteConnection client)

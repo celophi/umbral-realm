@@ -12,13 +12,13 @@ namespace UmbralRealm.Core.Tests.Network
     public class SocketFactoryTests
     {
         [Fact]
-        public void GivenNullEndpoint_SocketFactoryConstructed_Throws()
+        public void EndpointArgumentNull_SocketFactoryConstructed_Throws()
         {
             Assert.Throws<ArgumentNullException>(() => new SocketFactory(null!));
         }
 
         [Fact]
-        public void GivenValidEndpoint_CreateListeningSocketInvoked_SocketIsBoundAndListening()
+        public void EndpointArgumentValid_CreateListeningSocketInvoked_SocketIsBoundAndListening()
         {
             var endpoint = new IPEndPoint(IPAddress.Parse("1.2.3.4"), 0);
             var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -34,7 +34,7 @@ namespace UmbralRealm.Core.Tests.Network
         }
 
         [Fact]
-        public void GivenValidEndpoint_CreateConnectedSocketInvoked_SocketIsConnected()
+        public void EndpointArgumentValid_CreateConnectedSocketInvoked_SocketIsConnected()
         {
             var endpoint = new IPEndPoint(IPAddress.Parse("1.2.3.4"), 0);
             var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);

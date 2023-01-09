@@ -1,5 +1,4 @@
 ﻿using UmbralRealm.Core.IO;
-using UmbralRealm.Core.Network;
 using UmbralRealm.Core.Network.Interfaces;
 using UmbralRealm.Core.Network.Packet;
 using UmbralRealm.Core.Network.Packet.Interfaces;
