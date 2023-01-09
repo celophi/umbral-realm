@@ -7,6 +7,7 @@ using UmbralRealm.Core.Network;
 using UmbralRealm.Core.Network.Interfaces;
 using UmbralRealm.Core.Network.Packet;
 using UmbralRealm.Core.Security;
+using UmbralRealm.Core.Utilities;
 
 namespace UmbralRealm.Login.Service
 {
@@ -36,7 +37,7 @@ namespace UmbralRealm.Login.Service
                     var packetFactory = new PacketConverter(loginOpcodeMapping);
                     var connectionFactory = new ConnectionFactory(packetFactory);
 
-                    var mediator = new ConnectionMediator();
+                    var mediator = new BufferBlockMediator<IWriteConnection>();
 
                     var server = new SocketServer(socketFactory, endpoint, certificate, connectionFactory, mediator);
 

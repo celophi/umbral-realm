@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using UmbralRealm.Core.Network.Interfaces;
 using UmbralRealm.Core.Network.Packet.Interfaces;
+using UmbralRealm.Core.Utilities.Interfaces;
 using UmbralRealm.Login.Data;
 using UmbralRealm.Login.Packet.Client;
 using UmbralRealm.Login.Packet.Server;
 
 namespace UmbralRealm.Login.Service
 {
-    public class Handler : IConnectionSubscriber
+    public class Handler : IDataSubscriber<IWriteConnection>
     {
         private BufferBlock<IWriteConnection> _requestQueue = new BufferBlock<IWriteConnection>();
 
@@ -20,10 +21,10 @@ namespace UmbralRealm.Login.Service
 
         public Handler()
         {
-            _requestQueue.LinkTo(this.CreateActionBlock<IWriteConnection>(this.HandleConnection));
+            _requestQueue.LinkTo(this.CreateActionBlock<IWriteConnection>(this.Handle));
         }
 
-        public async Task HandleConnection(IWriteConnection connection)
+        public async Task Handle(IWriteConnection connection)
         {
             if (connection?.IsConnected != true)
             {

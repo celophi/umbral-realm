@@ -6,6 +6,7 @@ using UmbralRealm.Core.Network.Interfaces;
 using UmbralRealm.Core.Network.Packet.Model.Generic;
 using UmbralRealm.Core.Security;
 using UmbralRealm.Core.Utilities;
+using UmbralRealm.Core.Utilities.Interfaces;
 using UmbralRealm.Proxy;
 
 namespace UmbralRealm.Core.Network
@@ -45,7 +46,7 @@ namespace UmbralRealm.Core.Network
         /// <summary>
         /// Used for publishing validated connections to subscribers.
         /// </summary>
-        private readonly IConnectionMediator _connectionMediator;
+        private readonly IDataMediator<IWriteConnection> _connectionMediator;
 
         /// <summary>
         /// Creates a TCP server that can accept client connections.
@@ -54,7 +55,7 @@ namespace UmbralRealm.Core.Network
         /// <param name="endPoint"></param>
         /// <param name="certificate"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public SocketServer(SocketWrapperFactory socketFactory, IPEndPoint endPoint, NetworkCertificate certificate, IConnectionFactory connectionFactory, IConnectionMediator connectionMediator)
+        public SocketServer(SocketWrapperFactory socketFactory, IPEndPoint endPoint, NetworkCertificate certificate, IConnectionFactory connectionFactory, IDataMediator<IWriteConnection> connectionMediator)
         {
             _socketFactory = socketFactory ?? throw new ArgumentNullException(nameof(socketFactory));
             this.EndPoint = endPoint ?? throw new ArgumentNullException(nameof(endPoint));
