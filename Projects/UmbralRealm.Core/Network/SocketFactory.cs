@@ -42,7 +42,7 @@ namespace UmbralRealm.Core.Network
             return socket;
         }
 
-        private SocketWrapper CreateDefaultSocket() =>
+        protected virtual SocketWrapper CreateDefaultSocket() =>
             new(new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp));
     }
 }
