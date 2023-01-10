@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.IO.Abstractions;
 using CommandLine;
+using Zlib.Extended;
 
 namespace UmbralRealm.Archiver
 {
@@ -18,9 +20,8 @@ namespace UmbralRealm.Archiver
                 return;
             }
 
-            var indexPath = Path.Combine(result.Value.Source, _packageIndexFileName);
-            var unpacker = new Unpacker(indexPath, result.Value.Destination);
-            unpacker.Run().Wait();
+            var unpacker = new Unpacker(new PackageSystem(new FileSystem(), new Compressor()), result.Value.Source, result.Value.Destination);
+            unpacker.ExtractAll().Wait();
 
             Console.WriteLine("Press any key to exit the application.");
             Console.ReadLine();
