@@ -1,5 +1,4 @@
 ﻿using BinarySerialization;
-using UmbralRealm.Core.IO;
 using UmbralRealm.Core.Network.Packet;
 using UmbralRealm.Core.Network.Packet.Interfaces;
 
