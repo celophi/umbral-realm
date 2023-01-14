@@ -6,7 +6,7 @@ namespace UmbralRealm.Domain.ValueObjects
     /// <summary>
     /// Name for an account.
     /// </summary>
-    public sealed record UserName
+    public sealed record Username
     {
         /// <summary>
         /// Maximum length allowed.
@@ -27,31 +27,39 @@ namespace UmbralRealm.Domain.ValueObjects
         /// Creates a user name adhering to specific rules.
         /// </summary>
         /// <param name="value"></param>
-        public UserName(string value)
+        public Username(string value)
         {
-            this.Validate(value);
+            if (!IsValid(value))
+            {
+                throw new ArgumentException("Error. Argument does not meet the validation requirements.", nameof(value));
+            }
+
             this.Value = value;
         }
 
         /// <summary>
-        /// Validates a string value of a user name.
+        /// Validates a string value of a user name and returns 'true' if it meets the requirements.
         /// </summary>
         /// <param name="value"></param>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        /// <exception cref="FormatException"></exception>
-        private void Validate(string value)
+        /// <returns></returns>
+        public static bool IsValid(string value)
         {
-            ArgumentNullException.ThrowIfNull(value);
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return false;
+            }
 
             if (value.Length < MinLength || value.Length > MaxLength)
             {
-                throw new ArgumentOutOfRangeException(nameof(value));
+                return false;
             }
 
-            if (!Regex.IsMatch(value, "^[a-zA-Z0-9]*$"))
+            if (!Regex.IsMatch(value, "^[a-zA-Z0-9]*$", RegexOptions.Compiled))
             {
-                throw new FormatException("Error. The value does not meet the format expected for a user name.");
+                return false;
             }
+
+            return true;
         }
     }
 }

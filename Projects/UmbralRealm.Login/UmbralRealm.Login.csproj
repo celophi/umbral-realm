@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -9,10 +9,13 @@
   <ItemGroup>
     <PackageReference Include="BinarySerializer" Version="8.6.2.2" />
     <PackageReference Include="Dapper" Version="2.0.123" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\UmbralRealm.Core\UmbralRealm.Core.csproj" />
+    <ProjectReference Include="..\UmbralRealm.Domain\UmbralRealm.Domain.csproj" />
+    <ProjectReference Include="..\UmbralRealm.Types\UmbralRealm.Types.csproj" />
   </ItemGroup>
 
 </Project>

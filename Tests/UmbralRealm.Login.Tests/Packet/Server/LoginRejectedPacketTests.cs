@@ -19,7 +19,7 @@ namespace UmbralRealm.Login.Tests.Packet.Server
         /// <summary>
         /// Expected reason
         /// </summary>
-        private const ushort Reason = 2;
+        private const LoginFailureResult Reason = LoginFailureResult.InvalidCredentials1;
 
         /// <summary>
         /// Assert that packet model is correct and can deserialize a real packet dump.

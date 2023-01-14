@@ -4,10 +4,15 @@ namespace UmbralRealm.Login.Interfaces
 {
     public interface ILoginService
     {
-        public bool DoesAccountExist(string name);
-        public bool IsLoggedIn(string name);
-        public bool IsPasswordValid(string name, string password);
-        public void Login(string name);
-        public LoginRejectedPacket BuildLoginRejectedPacket();
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
+        Task<bool> DoesAccountExist(string username);
+        bool IsLoggedIn(string username);
+        bool IsPasswordValid(string username, string password);
+        void Login(string username);
+        LoginRejectedPacket BuildLoginRejectedPacket();
     }
 }

@@ -8,6 +8,8 @@ using UmbralRealm.Core.Network.Interfaces;
 using UmbralRealm.Core.Network.Packet;
 using UmbralRealm.Core.Security;
 using UmbralRealm.Core.Utilities;
+using UmbralRealm.Login.Data;
+using UmbralRealm.Login.Interfaces;
 
 namespace UmbralRealm.Login.Service
 {
@@ -23,7 +25,12 @@ namespace UmbralRealm.Login.Service
             var host = new HostBuilder()
                 .ConfigureServices(services =>
                 {
-                    
+                    services.AddScoped<IDbConnectionFactory, DbConnectionFactory>(provider =>
+                    {
+                        var connectionString = configuration.GetConnectionString("Default");
+                        return new DbConnectionFactory(connectionString!);
+                    });
+
                     var loginOpcodeMapping = OpcodeMapping.Create(new Packet.PacketOpcode());
 
                     // Setup server
@@ -46,10 +53,21 @@ namespace UmbralRealm.Login.Service
 
                     mediator2.Subscribe(server);
 
-                    var handler = new Handler();
-                    mediator.Subscribe(handler);
 
-                    services.AddHostedService(provider => listener);
+                    services.AddScoped<IAccountRepository, AccountRepository>();
+                    services.AddScoped<ILoginService, LoginService>();
+                    services.AddScoped<IServerInfoService, ServerInfoService>();
+                    services.AddScoped<LoginController>();
+                    
+                    services.AddHostedService(provider =>
+                    {
+                        var controller = provider.GetService<LoginController>();
+
+                        var handler = new Handler(controller!);
+                        mediator.Subscribe(handler);
+
+                        return listener;
+                    });
                 })
                 .UseConsoleLifetime()
                 .Build();

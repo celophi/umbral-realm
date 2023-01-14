@@ -19,9 +19,12 @@ namespace UmbralRealm.Login.Service
 
         private Dictionary<Guid, LoginState> _loginStatuses = new();
 
-        public Handler()
+        private readonly LoginController _controller;
+
+        public Handler(LoginController controller)
         {
             _requestQueue.LinkTo(this.CreateActionBlock<IWriteConnection>(this.Handle));
+            _controller = controller;
         }
 
         public async Task Handle(IWriteConnection connection)
@@ -70,7 +73,7 @@ namespace UmbralRealm.Login.Service
 
         private void HandleLoginAuthenticatePacket(IWriteConnection connection, LoginAuthenticatePacket packet)
         {
-
+            _controller.LoginAuthenticate(connection, packet);
             // TODO: handle
 
         }

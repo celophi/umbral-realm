@@ -8,33 +8,33 @@ namespace UmbralRealm.Domain.Tests.ValueObjects
 {
     public class MD5HashTests
     {
-        //[Fact]
-        //public async Task Failure()
-        //{
-        //    var a = new DbConnectionFactory("Data Source=localhost\\SQLEXPRESS;Initial Catalog=UmbralRealm;Integrated Security=SSPI;User Id=UmbralRealmReadWrite;Password=UmbralRealmReadWrite");
-        //    var p = new Provider(a);
+        [Fact]
+        public async Task Failure()
+        {
+            var a = new DbConnectionFactory("Data Source=localhost\\SQLEXPRESS;Initial Catalog=UmbralRealm;Integrated Security=SSPI;User Id=UmbralRealmReadWrite;Password=UmbralRealmReadWrite");
+            var p = new AccountRepository(a);
 
-        //    var aa = await p.SelectByName2("admin");
-        //}
+            var aa = await p.GetByUsername(new Username("admin2"));
+        }
 
         [Fact]
         public void WhenConstructed_WithANullArgument_ThrowsException()
         {
-            Assert.Throws<ArgumentNullException>(() => new MD5Hash(null!));
+            Assert.Throws<ArgumentException>(() => new MD5Hash(null!));
         }
 
         [Fact]
         public void WhenConstructed_WithAStringOfInvalidLength_ThrowsException()
         {
-            var value = new String('a', MD5Hash.HashLength + 1);
-            Assert.Throws<ArgumentOutOfRangeException>(() => new MD5Hash(value));
+            var value = new string('a', MD5Hash.HashLength + 1);
+            Assert.Throws<ArgumentException>(() => new MD5Hash(value));
         }
 
         [Fact]
         public void WhenConstructed_WithNotHexadecimalCharacters_ThrowsException()
         {
-            var value = new String('X', MD5Hash.HashLength);
-            Assert.Throws<FormatException>(() => new MD5Hash(value));
+            var value = new string('X', MD5Hash.HashLength);
+            Assert.Throws<ArgumentException>(() => new MD5Hash(value));
         }
 
         [Fact]

@@ -21,7 +21,7 @@ namespace UmbralRealm.Login.Packet.Server
         /// </summary>
         [FieldOrder(1)]
         [FieldCount(nameof(WorldCount))]
-        public readonly List<WorldSelectionInfo> WorldSelectionInfoList = new();
+        public List<WorldSelectionInfo> WorldSelectionInfoList = new();
 
         /// <summary>
         /// World ID that is highlighted by default.

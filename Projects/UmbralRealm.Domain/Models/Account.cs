@@ -6,12 +6,15 @@ namespace UmbralRealm.Domain.Models
 {
     public sealed class Account
     {
-        private readonly int AccountId;
+        /// <summary>
+        /// Uniquely identifies an account.
+        /// </summary>
+        private readonly int? AccountId;
 
         /// <summary>
         /// User name of the account.
         /// </summary>
-        public readonly UserName Name;
+        public readonly Username Username;
 
         /// <summary>
         /// Used to authenticate the account.
@@ -26,15 +29,15 @@ namespace UmbralRealm.Domain.Models
         /// <summary>
         /// Creates a new account.
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="username"></param>
         /// <param name="email"></param>
         /// <param name="password"></param>
-        public Account(UserName name, MD5Hash password)
+        public Account(Username username, MD5Hash password)
         {
-            ArgumentNullException.ThrowIfNull(name);
+            ArgumentNullException.ThrowIfNull(username);
             ArgumentNullException.ThrowIfNull(password);
 
-            this.Name = name;
+            this.Username = username;
             this.Password = password;
         }
 
@@ -85,7 +88,7 @@ namespace UmbralRealm.Domain.Models
             ArgumentNullException.ThrowIfNull(entity);
 
             this.AccountId = entity.AccountId;
-            this.Name = new UserName(entity.Name);
+            this.Username = new Username(entity.Username);
             this.Password = new MD5Hash(entity.Password);
 
             if (entity.Pin != null)
@@ -103,7 +106,7 @@ namespace UmbralRealm.Domain.Models
             return new AccountEntity
             (
                 this.AccountId,
-                this.Name.Value,
+                this.Username.Value,
                 this.Password.Value,
                 this.Pin?.Value
             );

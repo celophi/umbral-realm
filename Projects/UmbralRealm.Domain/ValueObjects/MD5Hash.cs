@@ -17,23 +17,37 @@ namespace UmbralRealm.Domain.ValueObjects
 
         public MD5Hash(string value)
         {
-            this.Validate(value);
+            if (!IsValid(value))
+            {
+                throw new ArgumentException("Error. Argument does not meet the validation requirements.", nameof(value));
+            }
+
             this.Value = value.ToUpper();
         }
 
-        private void Validate(string value)
+        /// <summary>
+        /// Validates a string value of an MD5 hash and returns 'true' if it meets the requirements.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static bool IsValid(string value)
         {
-            ArgumentNullException.ThrowIfNull(value);
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return false;
+            }
 
             if (value.Length != HashLength)
             {
-                throw new ArgumentOutOfRangeException(nameof(value));
+                return false;
             }
 
             if (!Regex.IsMatch(value, $"^[0-9a-fA-F]{{{HashLength}}}$", RegexOptions.Compiled))
             {
-                throw new FormatException("The value is not a valid MD5 hash.");
+                return false;
             }
+
+            return true;
         }
     }
 }

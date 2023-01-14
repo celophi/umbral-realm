@@ -4,40 +4,40 @@ using Xunit;
 
 namespace UmbralRealm.Domain.Tests.ValueObjects
 {
-    public class UserNameTests
+    public class UsernameTests
     {
         [Fact]
-        public void Construct_ValueIsNull_ThrowsArgumentNullException()
+        public void Construct_ValueIsNull_ThrowsArgumentException()
         {
-            Assert.Throws<ArgumentNullException>(() => new UserName(null!));
+            Assert.Throws<ArgumentException>(() => new Username(null!));
         }
 
         [Fact]
-        public void Construct_ValueLengthIsTooSmall_ThrowsArgumentOutOfRangeException()
+        public void Construct_ValueLengthIsTooSmall_ThrowsArgumentException()
         {
-            var value = new string('x', UserName.MinLength - 1);
-            Assert.Throws<ArgumentOutOfRangeException>(() => new UserName(value));
+            var value = new string('x', Username.MinLength - 1);
+            Assert.Throws<ArgumentException>(() => new Username(value));
         }
 
         [Fact]
-        public void Construct_ValueLengthIsTooBig_ThrowsArgumentOutOfRangeException()
+        public void Construct_ValueLengthIsTooBig_ThrowsArgumentException()
         {
-            var value = new string('x', UserName.MaxLength + 1);
-            Assert.Throws<ArgumentOutOfRangeException>(() => new UserName(value));
+            var value = new string('x', Username.MaxLength + 1);
+            Assert.Throws<ArgumentException>(() => new Username(value));
         }
 
         [Fact]
-        public void Construct_ValueHasInvalidCharacters_ThrowsFormatException()
+        public void Construct_ValueHasInvalidCharacters_ThrowsArgumentException()
         {
             var value = "!@#$%^&*()_+=-:;{}[]|";
-            Assert.Throws<FormatException>(() => new UserName(value));
+            Assert.Throws<ArgumentException>(() => new Username(value));
         }
 
         [Fact]
         public void Construct_ValueHasValidCharacters_SetsInternalValue()
         {
             var value = "MyName";
-            var username = new UserName(value);
+            var username = new Username(value);
 
             Assert.Equal(value, username.Value);
         }
