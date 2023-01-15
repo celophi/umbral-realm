@@ -1,7 +1,6 @@
 ﻿using System.Data;
 using Dapper;
 using UmbralRealm.Domain.ValueObjects;
-using UmbralRealm.Login.Dto;
 using UmbralRealm.Types.Entities;
 
 namespace UmbralRealm.Login.Data
@@ -13,6 +12,11 @@ namespace UmbralRealm.Login.Data
         /// </summary>
         private readonly IDbConnectionFactory _dbConnectionFactory;
 
+        /// <summary>
+        /// Creates a repository to interact with the database and account information.
+        /// </summary>
+        /// <param name="dbConnectionFactory"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public AccountRepository(IDbConnectionFactory dbConnectionFactory)
         {
             _dbConnectionFactory = dbConnectionFactory ?? throw new ArgumentNullException(nameof(dbConnectionFactory));
@@ -64,7 +68,7 @@ namespace UmbralRealm.Login.Data
                 parameters.Add("username", username.Value, DbType.String);
 
                 using var connection = _dbConnectionFactory.Create();
-                return await connection.QueryFirstOrDefaultAsync<AccountEntity>("Account_Select_ByName", parameters, commandType: CommandType.StoredProcedure);
+                return await connection.QueryFirstOrDefaultAsync<AccountEntity>("Account_GetByUsername", parameters, commandType: CommandType.StoredProcedure);
             }
             catch (Exception ex)
             {

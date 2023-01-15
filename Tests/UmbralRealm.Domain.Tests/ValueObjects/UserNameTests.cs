@@ -15,7 +15,7 @@ namespace UmbralRealm.Domain.Tests.ValueObjects
         [Fact]
         public void Construct_ValueLengthIsTooSmall_ThrowsArgumentException()
         {
-            var value = new string('x', Username.MinLength - 1);
+            var value = string.Empty;
             Assert.Throws<ArgumentException>(() => new Username(value));
         }
 

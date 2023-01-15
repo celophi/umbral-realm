@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[Account_Select_ByName]
+﻿CREATE PROCEDURE [dbo].[Account_GetByUsername]
 	@username VARCHAR(50)
 AS
 BEGIN
@@ -7,6 +7,7 @@ BEGIN
         , [Username]
         , [Password]
         , [Pin]
+        , [Standing]
     FROM [dbo].[Account]
     WHERE
         [Username] = @username;

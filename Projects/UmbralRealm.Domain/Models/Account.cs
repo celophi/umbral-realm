@@ -4,6 +4,9 @@ using UmbralRealm.Types.Entities;
 
 namespace UmbralRealm.Domain.Models
 {
+    /// <summary>
+    /// Information relating to a user of the game.
+    /// </summary>
     public sealed class Account
     {
         /// <summary>

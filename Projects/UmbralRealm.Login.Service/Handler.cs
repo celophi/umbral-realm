@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
+﻿using System.Threading.Tasks.Dataflow;
+using MediatR;
 using UmbralRealm.Core.Network.Interfaces;
 using UmbralRealm.Core.Network.Packet.Interfaces;
 using UmbralRealm.Core.Utilities.Interfaces;
-using UmbralRealm.Login.Data;
-using UmbralRealm.Login.Packet.Client;
 using UmbralRealm.Login.Packet.Server;
 
 namespace UmbralRealm.Login.Service
@@ -21,10 +15,14 @@ namespace UmbralRealm.Login.Service
 
         private readonly LoginController _controller;
 
-        public Handler(LoginController controller)
+        private readonly IMediator _mediator;
+
+        public Handler(LoginController controller, IMediator mediator)
         {
             _requestQueue.LinkTo(this.CreateActionBlock<IWriteConnection>(this.Handle));
             _controller = controller;
+
+            _mediator = mediator;
         }
 
         public async Task Handle(IWriteConnection connection)
@@ -58,30 +56,12 @@ namespace UmbralRealm.Login.Service
 
         private void Process(IWriteConnection connection, IPacket packet)
         {
-            if (packet is LoginAuthenticatePacket)
-            {
-                this.HandleLoginAuthenticatePacket(connection, (LoginAuthenticatePacket)packet);
-                return;
-            }
+            // TODO: Perhaps there is a way to accomplish this without activator.
 
-            if (packet is WorldAuthenticatePacket)
-            {
-                this.HandleWorldAuthenticatePacket(connection, (WorldAuthenticatePacket)packet);
-                return;
-            }
-        }
-
-        private void HandleLoginAuthenticatePacket(IWriteConnection connection, LoginAuthenticatePacket packet)
-        {
-            _controller.LoginAuthenticate(connection, packet);
-            // TODO: handle
-
-        }
-
-        private void HandleWorldAuthenticatePacket(IWriteConnection connection, WorldAuthenticatePacket packet)
-        {
-            // TODO: handle
-
+            var packetType = packet.GetType();
+            var gen = typeof(GenericRequest<>).MakeGenericType(new[] { packetType });
+            var request = Activator.CreateInstance(gen, new object[] { connection, packet} );
+            var result = _mediator.Send(request!).Result;
         }
 
         /// <summary>

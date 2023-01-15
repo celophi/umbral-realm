@@ -1,5 +1,7 @@
 ﻿using System.Net;
+using System.Reflection;
 using System.Threading.Tasks.Dataflow;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -10,6 +12,8 @@ using UmbralRealm.Core.Security;
 using UmbralRealm.Core.Utilities;
 using UmbralRealm.Login.Data;
 using UmbralRealm.Login.Interfaces;
+using UmbralRealm.Login.Service.Behaviors;
+using UmbralRealm.Login.Service.Requests;
 
 namespace UmbralRealm.Login.Service
 {
@@ -25,6 +29,8 @@ namespace UmbralRealm.Login.Service
             var host = new HostBuilder()
                 .ConfigureServices(services =>
                 {
+                    Program.AddApplication(services);
+
                     services.AddScoped<IDbConnectionFactory, DbConnectionFactory>(provider =>
                     {
                         var connectionString = configuration.GetConnectionString("Default");
@@ -62,8 +68,9 @@ namespace UmbralRealm.Login.Service
                     services.AddHostedService(provider =>
                     {
                         var controller = provider.GetService<LoginController>();
+                        var mediator2 = provider.GetService<IMediator>();
 
-                        var handler = new Handler(controller!);
+                        var handler = new Handler(controller!, mediator2!);
                         mediator.Subscribe(handler);
 
                         return listener;
@@ -72,12 +79,19 @@ namespace UmbralRealm.Login.Service
                 .UseConsoleLifetime()
                 .Build();
 
+
             host.Run();
 
             Console.WriteLine("Hello, World!");
         }
 
+        private static void AddApplication(IServiceCollection services)
+        {
+            //IRequestHandler<GenericRequest<LoginAuthenticatePacket>, IPacket>
 
+            services.AddMediatR(AppDomain.CurrentDomain.GetAssemblies());
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
+        }
 
         /// <summary>
         /// Parse the options to return a useable endpoint.

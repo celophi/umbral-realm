@@ -3,6 +3,9 @@ using System.Text.RegularExpressions;
 
 namespace UmbralRealm.Domain.ValueObjects
 {
+    /// <summary>
+    /// MD5 hash.
+    /// </summary>
     public sealed record MD5Hash
     {
         /// <summary>

@@ -14,11 +14,6 @@ namespace UmbralRealm.Domain.ValueObjects
         public const int MaxLength = 50;
 
         /// <summary>
-        /// Minimum length allowed.
-        /// </summary>
-        public const int MinLength = 1;
-
-        /// <summary>
         /// Underlying value.
         /// </summary>
         public readonly string Value;
@@ -49,7 +44,7 @@ namespace UmbralRealm.Domain.ValueObjects
                 return false;
             }
 
-            if (value.Length < MinLength || value.Length > MaxLength)
+            if (value.Length > MaxLength)
             {
                 return false;
             }
