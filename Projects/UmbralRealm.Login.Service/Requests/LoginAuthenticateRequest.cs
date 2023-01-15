@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using UmbralRealm.Core.Network.Interfaces;
 using UmbralRealm.Core.Network.Packet.Interfaces;
 using UmbralRealm.Login.Packet.Client;
 

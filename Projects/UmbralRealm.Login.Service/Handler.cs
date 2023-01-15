@@ -13,15 +13,11 @@ namespace UmbralRealm.Login.Service
 
         private Dictionary<Guid, LoginState> _loginStatuses = new();
 
-        private readonly LoginController _controller;
-
         private readonly IMediator _mediator;
 
-        public Handler(LoginController controller, IMediator mediator)
+        public Handler(IMediator mediator)
         {
             _requestQueue.LinkTo(this.CreateActionBlock<IWriteConnection>(this.Handle));
-            _controller = controller;
-
             _mediator = mediator;
         }
 
@@ -60,7 +56,10 @@ namespace UmbralRealm.Login.Service
 
             var packetType = packet.GetType();
             var gen = typeof(GenericRequest<>).MakeGenericType(new[] { packetType });
-            var request = Activator.CreateInstance(gen, new object[] { connection, packet} );
+            var request = Activator.CreateInstance(gen, new object[] { connection, packet });
+
+
+
             var result = _mediator.Send(request!).Result;
         }
 

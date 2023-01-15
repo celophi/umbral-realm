@@ -27,14 +27,14 @@ namespace UmbralRealm.Login
             ArgumentNullException.ThrowIfNull(connection);
             ArgumentNullException.ThrowIfNull(packet);
 
-            var validator = new LoginAuthenticatePacketValidator();
-            var validationResult = await validator.ValidateAsync(packet);
+            //var validator = new LoginAuthenticatePacketValidator();
+            //var validationResult = await validator.ValidateAsync(packet);
 
-            if (!validationResult.IsValid)
-            {
-                connection.Disconnect();
-                return;
-            }
+            //if (!validationResult.IsValid)
+            //{
+            //    connection.Disconnect();
+            //    return;
+            //}
 
             var username = new Username(packet.Account.Text);
             var accountEntity = await _accountRepository.GetByUsername(username);

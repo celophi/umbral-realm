@@ -16,4 +16,9 @@ namespace UmbralRealm.Login.Service
             this.Packet = packet;
         }
     }
+
+    public interface IGenericRequest<TResponse> : IRequest<TResponse>
+    {
+
+    }
 }

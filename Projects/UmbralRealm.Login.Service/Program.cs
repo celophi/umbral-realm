@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Reflection;
 using System.Threading.Tasks.Dataflow;
+using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -67,10 +68,9 @@ namespace UmbralRealm.Login.Service
                     
                     services.AddHostedService(provider =>
                     {
-                        var controller = provider.GetService<LoginController>();
                         var mediator2 = provider.GetService<IMediator>();
 
-                        var handler = new Handler(controller!, mediator2!);
+                        var handler = new Handler(mediator2!);
                         mediator.Subscribe(handler);
 
                         return listener;
@@ -91,6 +91,7 @@ namespace UmbralRealm.Login.Service
 
             services.AddMediatR(AppDomain.CurrentDomain.GetAssemblies());
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
+            services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         }
 
         /// <summary>
