@@ -6,7 +6,7 @@ namespace UmbralRealm.Login.Service
 {
     public class GenericRequest<TInput> : IGenericRequest<IPacket> where TInput : IPacket
     {
-        public readonly IWriteConnection Connection;
+        public IWriteConnection Connection { get; private set; }
 
         public readonly TInput Packet;
 
@@ -19,6 +19,6 @@ namespace UmbralRealm.Login.Service
 
     public interface IGenericRequest<TResponse> : IRequest<TResponse>
     {
-
+        IWriteConnection Connection { get; }
     }
 }
