@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using UmbralRealm.Core.Network;
 using UmbralRealm.Core.Network.Interfaces;
 using UmbralRealm.Core.Network.Packet;
+using UmbralRealm.Core.Network.Packet.Interfaces;
 using UmbralRealm.Core.Security;
 using UmbralRealm.Core.Utilities;
 using UmbralRealm.Login.Data;
@@ -88,7 +89,7 @@ namespace UmbralRealm.Login.Service
         private static void AddApplication(IServiceCollection services)
         {
             //IRequestHandler<GenericRequest<LoginAuthenticatePacket>, IPacket>
-
+            services.AddTransient(typeof(IGenericRequest<>), typeof(GenericRequest<>));
             services.AddMediatR(AppDomain.CurrentDomain.GetAssemblies());
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());

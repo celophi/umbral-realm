@@ -4,7 +4,8 @@ using UmbralRealm.Core.Network.Packet.Interfaces;
 
 namespace UmbralRealm.Login.Service.Behaviors
 {
-    public class RequestValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse> 
+    public class RequestValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> 
+        where TRequest : IGenericRequest<TResponse>
     {
         private readonly IEnumerable<IValidator<TRequest>> _validators;
 

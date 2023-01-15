@@ -4,13 +4,13 @@ using UmbralRealm.Core.Network.Packet.Interfaces;
 
 namespace UmbralRealm.Login.Service
 {
-    public class GenericRequest<TPacket> : IRequest<IPacket> where TPacket : IPacket
+    public class GenericRequest<TInput> : IGenericRequest<IPacket> where TInput : IPacket
     {
         public readonly IWriteConnection Connection;
 
-        public readonly TPacket Packet;
+        public readonly TInput Packet;
 
-        public GenericRequest(IWriteConnection connection, TPacket packet)
+        public GenericRequest(IWriteConnection connection, TInput packet)
         {
             this.Connection = connection;
             this.Packet = packet;
