@@ -1,11 +1,10 @@
 ﻿using FluentValidation;
 using MediatR;
-using UmbralRealm.Core.Network.Packet.Interfaces;
 
 namespace UmbralRealm.Login.Service.Behaviors
 {
     public class RequestValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> 
-        where TRequest : IGenericRequest<TResponse>
+        where TRequest : IGenericRequest<TResponse> where TResponse : PipelineResult
     {
         private readonly IEnumerable<IValidator<TRequest>> _validators;
 
@@ -24,9 +23,12 @@ namespace UmbralRealm.Login.Service.Behaviors
                 .Where(f => f != null)
                 .ToList();
 
-            if (failures.Count != 0)
+            if (failures.Any())
             {
-                throw new ValidationException(failures);
+                request.Connection.Disconnect();
+
+                var result = new PipelineResult();
+                return Task.FromResult((TResponse)result);
             }
 
             return next();

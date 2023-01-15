@@ -44,23 +44,29 @@ namespace UmbralRealm.Login.Service
 
             if (connection.TryGetPacket(out var packet))
             {
-                this.Process(connection, packet);
+                await this.Process(connection, packet);
             }
 
             await _requestQueue.SendAsync(connection);
         }
 
-        private void Process(IWriteConnection connection, IPacket packet)
+        private async Task Process(IWriteConnection connection, IPacket packet)
         {
             // TODO: Perhaps there is a way to accomplish this without activator.
 
             var packetType = packet.GetType();
-            var gen = typeof(GenericRequest<>).MakeGenericType(new[] { packetType });
+            var gen = typeof(RequestContext<>).MakeGenericType(new[] { packetType });
             var request = Activator.CreateInstance(gen, new object[] { connection, packet });
 
 
-
-            var result = _mediator.Send(request!).Result;
+            try
+            {
+                var result = await _mediator.Send(request!);
+            }
+            catch (Exception e)
+            {
+                var a = e;
+            }
         }
 
         /// <summary>

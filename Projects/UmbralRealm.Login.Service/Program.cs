@@ -65,7 +65,6 @@ namespace UmbralRealm.Login.Service
                     services.AddScoped<IAccountRepository, AccountRepository>();
                     services.AddScoped<ILoginService, LoginService>();
                     services.AddScoped<IServerInfoService, ServerInfoService>();
-                    services.AddScoped<LoginController>();
                     
                     services.AddHostedService(provider =>
                     {
@@ -89,7 +88,7 @@ namespace UmbralRealm.Login.Service
         private static void AddApplication(IServiceCollection services)
         {
             //IRequestHandler<GenericRequest<LoginAuthenticatePacket>, IPacket>
-            services.AddTransient(typeof(IGenericRequest<>), typeof(GenericRequest<>));
+            services.AddTransient(typeof(IGenericRequest<>), typeof(RequestContext<>));
             services.AddMediatR(AppDomain.CurrentDomain.GetAssemblies());
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
