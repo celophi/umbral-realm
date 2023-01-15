@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using System.Reflection;
-using System.Threading.Tasks.Dataflow;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Configuration;
@@ -9,13 +8,11 @@ using Microsoft.Extensions.Hosting;
 using UmbralRealm.Core.Network;
 using UmbralRealm.Core.Network.Interfaces;
 using UmbralRealm.Core.Network.Packet;
-using UmbralRealm.Core.Network.Packet.Interfaces;
 using UmbralRealm.Core.Security;
 using UmbralRealm.Core.Utilities;
 using UmbralRealm.Login.Data;
-using UmbralRealm.Login.Interfaces;
 using UmbralRealm.Login.Service.Behaviors;
-using UmbralRealm.Login.Service.Requests;
+using UmbralRealm.Login.Service.Interfaces;
 
 namespace UmbralRealm.Login.Service
 {
@@ -63,7 +60,6 @@ namespace UmbralRealm.Login.Service
 
 
                     services.AddScoped<IAccountRepository, AccountRepository>();
-                    services.AddScoped<ILoginService, LoginService>();
                     services.AddScoped<IServerInfoService, ServerInfoService>();
                     
                     services.AddHostedService(provider =>

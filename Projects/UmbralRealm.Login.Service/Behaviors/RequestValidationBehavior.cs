@@ -4,7 +4,7 @@ using MediatR;
 namespace UmbralRealm.Login.Service.Behaviors
 {
     public class RequestValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> 
-        where TRequest : IGenericRequest<TResponse> where TResponse : PipelineResult
+        where TRequest : IGenericRequest<TResponse> where TResponse : RequestResult
     {
         private readonly IEnumerable<IValidator<TRequest>> _validators;
 
@@ -27,7 +27,7 @@ namespace UmbralRealm.Login.Service.Behaviors
             {
                 request.Connection.Disconnect();
 
-                var result = new PipelineResult();
+                var result = new RequestResult();
                 return Task.FromResult((TResponse)result);
             }
 

@@ -1,6 +1,6 @@
 ﻿using UmbralRealm.Login.Packet.Server;
 
-namespace UmbralRealm.Login.Interfaces
+namespace UmbralRealm.Login.Service.Interfaces
 {
     public interface ILoginService
     {

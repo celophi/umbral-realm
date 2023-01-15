@@ -3,30 +3,52 @@ using UmbralRealm.Core.Network.Interfaces;
 using UmbralRealm.Domain.Models;
 using UmbralRealm.Domain.ValueObjects;
 using UmbralRealm.Login.Data;
-using UmbralRealm.Login.Interfaces;
 using UmbralRealm.Login.Packet.Client;
 using UmbralRealm.Login.Packet.Server;
+using UmbralRealm.Login.Service.Interfaces;
 
 namespace UmbralRealm.Login.Service.Requests
 {
-    public class LoginAuthenticateRequestHandler : IRequestHandler<RequestContext<LoginAuthenticatePacket>, PipelineResult>
+    /// <summary>
+    /// Request handler for <see cref="LoginAuthenticatePacket"/>
+    /// </summary>
+    public class LoginAuthenticateRequestHandler : IRequestHandler<RequestContext<LoginAuthenticatePacket>, RequestResult>
     {
+        /// <summary>
+        /// Used for accessing account data from persistence.
+        /// </summary>
         private readonly IAccountRepository _accountRepository;
+
+        /// <summary>
+        /// Used for retrieving metadata about available servers.
+        /// </summary>
         private readonly IServerInfoService _serverInfoService;
 
+        /// <summary>
+        /// Creates an instance of this handler.
+        /// </summary>
+        /// <param name="accountRepository"></param>
+        /// <param name="serverInfoService"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public LoginAuthenticateRequestHandler(IAccountRepository accountRepository, IServerInfoService serverInfoService)
         {
             _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
             _serverInfoService = serverInfoService ?? throw new ArgumentNullException(nameof(serverInfoService));
         }
 
-        public async Task<PipelineResult> Handle(RequestContext<LoginAuthenticatePacket> requestContext, CancellationToken cancellationToken)
+        /// <summary>
+        /// Handles a request of the <see cref="LoginAuthenticatePacket"/> packet type.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task<RequestResult> Handle(RequestContext<LoginAuthenticatePacket> context, CancellationToken cancellationToken)
         {
-            ArgumentNullException.ThrowIfNull(requestContext);
+            ArgumentNullException.ThrowIfNull(context);
 
-            var result = new PipelineResult();
-            var request = requestContext.Request;
-            var connection = requestContext.Connection;
+            var result = new RequestResult();
+            var request = context.Request;
+            var connection = context.Connection;
 
             var username = new Username(request.Account.Text);
             var accountEntity = await _accountRepository.GetByUsername(username);
@@ -52,6 +74,11 @@ namespace UmbralRealm.Login.Service.Requests
             return result;
         }
 
+        /// <summary>
+        /// Sends an invalid credentials result to the connection.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <returns></returns>
         private async Task SendInvalidCredentialsResponse(IWriteConnection connection)
         {
             await connection.SendAsync(new LoginRejectedPacket

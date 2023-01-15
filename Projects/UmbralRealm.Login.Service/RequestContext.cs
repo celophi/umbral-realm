@@ -4,7 +4,7 @@ using UmbralRealm.Core.Network.Packet.Interfaces;
 
 namespace UmbralRealm.Login.Service
 {
-    public class RequestContext<TInput> : IGenericRequest<PipelineResult> where TInput : IPacket
+    public class RequestContext<TInput> : IGenericRequest<RequestResult> where TInput : IPacket
     {
         public IWriteConnection Connection { get; private set; }
 
