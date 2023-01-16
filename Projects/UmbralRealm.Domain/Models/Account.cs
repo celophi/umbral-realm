@@ -1,6 +1,7 @@
 ﻿using System;
+using UmbralRealm.Domain.Entities;
+using UmbralRealm.Domain.Enumerations;
 using UmbralRealm.Domain.ValueObjects;
-using UmbralRealm.Types.Entities;
 
 namespace UmbralRealm.Domain.Models
 {
@@ -28,6 +29,11 @@ namespace UmbralRealm.Domain.Models
         /// Additional verification for authenticating.
         /// </summary>
         public MD5Hash? Pin { get; private set; }
+
+        /// <summary>
+        /// Trust level for this account.
+        /// </summary>
+        public AccountStanding Standing { get; private set; }
 
         /// <summary>
         /// Creates a new account.
@@ -98,6 +104,8 @@ namespace UmbralRealm.Domain.Models
             {
                 this.Pin = new MD5Hash(entity.Pin);
             }
+
+            this.Standing = entity.Standing;
         }
 
         /// <summary>
@@ -111,7 +119,8 @@ namespace UmbralRealm.Domain.Models
                 this.AccountId,
                 this.Username.Value,
                 this.Password.Value,
-                this.Pin?.Value
+                this.Pin?.Value,
+                this.Standing
             );
         }
 

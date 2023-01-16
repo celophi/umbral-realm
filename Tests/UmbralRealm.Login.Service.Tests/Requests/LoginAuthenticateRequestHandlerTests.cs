@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Moq;
 using UmbralRealm.Core.Network.Interfaces;
 using UmbralRealm.Core.Network.Packet.Interfaces;
+using UmbralRealm.Domain.Enumerations;
 using UmbralRealm.Domain.ValueObjects;
 using UmbralRealm.Login.Data;
 using UmbralRealm.Login.Packet.Client;
@@ -81,7 +82,7 @@ namespace UmbralRealm.Login.Service.Tests.Requests
                 }
             };
 
-            var accountEntity = new Types.Entities.AccountEntity(1, packet.Account.Text, "098f6bcd4621d373cade4e832627b4f6", null);
+            var accountEntity = new Domain.Entities.AccountEntity(1, packet.Account.Text, "098f6bcd4621d373cade4e832627b4f6", null, AccountStanding.Trusted);
 
             IPacket response = null;
             var connection = new Mock<IWriteConnection>();
@@ -116,7 +117,7 @@ namespace UmbralRealm.Login.Service.Tests.Requests
                 }
             };
 
-            var accountEntity = new Types.Entities.AccountEntity(1, packet.Account.Text, "098f6bcd4621d373cade4e832627b4f6", null);
+            var accountEntity = new Domain.Entities.AccountEntity(1, packet.Account.Text, "098f6bcd4621d373cade4e832627b4f6", null, AccountStanding.Trusted);
 
             var connection = new Mock<IWriteConnection>();
 

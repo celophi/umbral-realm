@@ -15,7 +15,6 @@
   <ItemGroup>
     <ProjectReference Include="..\UmbralRealm.Core\UmbralRealm.Core.csproj" />
     <ProjectReference Include="..\UmbralRealm.Domain\UmbralRealm.Domain.csproj" />
-    <ProjectReference Include="..\UmbralRealm.Types\UmbralRealm.Types.csproj" />
   </ItemGroup>
 
 </Project>

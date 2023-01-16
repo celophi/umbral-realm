@@ -10,8 +10,4 @@
     <PackageReference Include="FluentValidation" Version="11.4.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\UmbralRealm.Types\UmbralRealm.Types.csproj" />
-  </ItemGroup>
-
 </Project>

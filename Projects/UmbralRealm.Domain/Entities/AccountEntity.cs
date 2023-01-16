@@ -1,4 +1,6 @@
-﻿namespace UmbralRealm.Types.Entities
+﻿using UmbralRealm.Domain.Enumerations;
+
+namespace UmbralRealm.Domain.Entities
 {
     /// <summary>
     /// Represents a persistent state of an account.
@@ -8,10 +10,12 @@
     /// <param name="Username">Name of the account.</param>
     /// <param name="Password">Password of the account.</param>
     /// <param name="Pin">Pin number for the account.</param>
+    /// <param name="Standing">Trust level for the account.</param>
     public sealed record AccountEntity(
         int? AccountId,
         string Username,
         string Password,
-        string? Pin
+        string? Pin,
+        AccountStanding Standing
     );
 }

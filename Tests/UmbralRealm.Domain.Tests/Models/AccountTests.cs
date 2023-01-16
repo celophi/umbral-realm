@@ -1,7 +1,8 @@
 ﻿using System;
+using UmbralRealm.Domain.Entities;
+using UmbralRealm.Domain.Enumerations;
 using UmbralRealm.Domain.Models;
 using UmbralRealm.Domain.ValueObjects;
-using UmbralRealm.Types.Entities;
 using Xunit;
 
 namespace UmbralRealm.Domain.Tests.Models
@@ -144,7 +145,7 @@ namespace UmbralRealm.Domain.Tests.Models
             var username = new Username("username");
             var password = new MD5Hash("098f6bcd4621d373cade4e832627b4f6");
 
-            var entity = new AccountEntity(accountId, username.Value, password.Value, Pin: null);
+            var entity = new AccountEntity(accountId, username.Value, password.Value, Pin: null, AccountStanding.Trusted);
             var account = new Account(entity);
 
             var output = account.ToEntity();
@@ -168,7 +169,7 @@ namespace UmbralRealm.Domain.Tests.Models
             var password = new MD5Hash("098f6bcd4621d373cade4e832627b4f6");
             var pin = new MD5Hash("098f6bcd4621d373cade4e832627b4f6");
 
-            var entity = new AccountEntity(accountId, username.Value, password.Value, pin.Value);
+            var entity = new AccountEntity(accountId, username.Value, password.Value, pin.Value, AccountStanding.Trusted);
             var account = new Account(entity);
 
             Assert.Equal(username, account.Username);
@@ -183,7 +184,7 @@ namespace UmbralRealm.Domain.Tests.Models
             var username = new Username("username");
             var password = new MD5Hash("098f6bcd4621d373cade4e832627b4f6");
 
-            var entity = new AccountEntity(accountId, username.Value, password.Value, Pin: null);
+            var entity = new AccountEntity(accountId, username.Value, password.Value, Pin: null, AccountStanding.Trusted);
             var account = new Account(entity);
 
             Assert.Equal(username, account.Username);

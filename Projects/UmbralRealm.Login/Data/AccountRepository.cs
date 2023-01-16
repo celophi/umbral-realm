@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using Dapper;
+using UmbralRealm.Domain.Entities;
 using UmbralRealm.Domain.ValueObjects;
-using UmbralRealm.Types.Entities;
 
 namespace UmbralRealm.Login.Data
 {

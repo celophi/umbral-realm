@@ -38,7 +38,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UmbralRealm.Domain", "Proje
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UmbralRealm.Domain.Tests", "Tests\UmbralRealm.Domain.Tests\UmbralRealm.Domain.Tests.csproj", "{4507F6EA-8DA0-497D-9407-BFE05A72665B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbralRealm.Types", "Projects\UmbralRealm.Types\UmbralRealm.Types.csproj", "{054A8022-C163-4158-8A23-ED1FCBAF0B0C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbralRealm.Login.Service.Tests", "Tests\UmbralRealm.Login.Service.Tests\UmbralRealm.Login.Service.Tests.csproj", "{0C75C090-E87B-4230-857A-938AFB7B31F1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -99,10 +99,10 @@ Global
 		{4507F6EA-8DA0-497D-9407-BFE05A72665B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4507F6EA-8DA0-497D-9407-BFE05A72665B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4507F6EA-8DA0-497D-9407-BFE05A72665B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{054A8022-C163-4158-8A23-ED1FCBAF0B0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{054A8022-C163-4158-8A23-ED1FCBAF0B0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{054A8022-C163-4158-8A23-ED1FCBAF0B0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{054A8022-C163-4158-8A23-ED1FCBAF0B0C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C75C090-E87B-4230-857A-938AFB7B31F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C75C090-E87B-4230-857A-938AFB7B31F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C75C090-E87B-4230-857A-938AFB7B31F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C75C090-E87B-4230-857A-938AFB7B31F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -121,7 +121,7 @@ Global
 		{07E50E52-8B34-4610-AC90-4268FF5AA455} = {45E3CC49-8622-4979-92BC-C42009C06E8E}
 		{37014DC4-0CFD-4CA5-A591-A3BAC6DB650E} = {ED49CE50-7281-4837-92DE-37E42FB10B0B}
 		{4507F6EA-8DA0-497D-9407-BFE05A72665B} = {45E3CC49-8622-4979-92BC-C42009C06E8E}
-		{054A8022-C163-4158-8A23-ED1FCBAF0B0C} = {ED49CE50-7281-4837-92DE-37E42FB10B0B}
+		{0C75C090-E87B-4230-857A-938AFB7B31F1} = {45E3CC49-8622-4979-92BC-C42009C06E8E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B54FABAF-44EC-4CAF-96E0-D00F6DDC82C4}

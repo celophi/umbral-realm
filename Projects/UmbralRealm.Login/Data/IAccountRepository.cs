@@ -1,5 +1,5 @@
-﻿using UmbralRealm.Domain.ValueObjects;
-using UmbralRealm.Types.Entities;
+﻿using UmbralRealm.Domain.Entities;
+using UmbralRealm.Domain.ValueObjects;
 
 namespace UmbralRealm.Login.Data
 {
