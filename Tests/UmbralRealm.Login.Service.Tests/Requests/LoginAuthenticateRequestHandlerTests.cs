@@ -103,7 +103,77 @@ namespace UmbralRealm.Login.Service.Tests.Requests
         }
 
         [Fact]
-        public async Task Handle_AccountPasswordValid_SendsLoginRejectedPacket()
+        public async Task Handle_AccountStandingSuspended_SendsLoginRejectedPacket()
+        {
+            var packet = new LoginAuthenticatePacket
+            {
+                Account = new Core.IO.LengthPrefixedString
+                {
+                    Text = "MyAccount"
+                },
+                Password = new Core.IO.LengthPrefixedString
+                {
+                    Text = "098f6bcd4621d373cade4e832627b4f6"
+                }
+            };
+
+            var accountEntity = new Domain.Entities.AccountEntity(1, packet.Account.Text, packet.Password.Text, null, AccountStanding.Suspended);
+
+            IPacket response = null;
+            var connection = new Mock<IWriteConnection>();
+            connection.Setup(m => m.SendAsync(It.IsAny<LoginRejectedPacket>()))
+                .Callback<IPacket>(result => response = result);
+
+            var accountRepository = new Mock<IAccountRepository>();
+            accountRepository.Setup(m => m.GetByUsername(It.IsAny<Username>())).Returns(Task.FromResult(accountEntity));
+
+            var serverInfoService = new Mock<IServerInfoService>();
+            var context = new RequestContext<LoginAuthenticatePacket>(connection.Object, packet);
+            var handler = new LoginAuthenticateRequestHandler(accountRepository.Object, serverInfoService.Object);
+
+            await handler.Handle(context, default);
+
+            connection.Verify(m => m.SendAsync(It.IsAny<LoginRejectedPacket>()), Times.Once);
+            Assert.Equal(LoginFailureResult.AccountSuspended, ((LoginRejectedPacket)response!).Reason);
+        }
+
+        [Fact]
+        public async Task Handle_AccountStandingLocked_SendsLoginRejectedPacket()
+        {
+            var packet = new LoginAuthenticatePacket
+            {
+                Account = new Core.IO.LengthPrefixedString
+                {
+                    Text = "MyAccount"
+                },
+                Password = new Core.IO.LengthPrefixedString
+                {
+                    Text = "098f6bcd4621d373cade4e832627b4f6"
+                }
+            };
+
+            var accountEntity = new Domain.Entities.AccountEntity(1, packet.Account.Text, packet.Password.Text, null, AccountStanding.Locked);
+
+            IPacket response = null;
+            var connection = new Mock<IWriteConnection>();
+            connection.Setup(m => m.SendAsync(It.IsAny<LoginRejectedPacket>()))
+                .Callback<IPacket>(result => response = result);
+
+            var accountRepository = new Mock<IAccountRepository>();
+            accountRepository.Setup(m => m.GetByUsername(It.IsAny<Username>())).Returns(Task.FromResult(accountEntity));
+
+            var serverInfoService = new Mock<IServerInfoService>();
+            var context = new RequestContext<LoginAuthenticatePacket>(connection.Object, packet);
+            var handler = new LoginAuthenticateRequestHandler(accountRepository.Object, serverInfoService.Object);
+
+            await handler.Handle(context, default);
+
+            connection.Verify(m => m.SendAsync(It.IsAny<LoginRejectedPacket>()), Times.Once);
+            Assert.Equal(LoginFailureResult.AccountLocked, ((LoginRejectedPacket)response!).Reason);
+        }
+
+        [Fact]
+        public async Task Handle_AccountPasswordValid_SendsWorldSelectionPacket()
         {
             var packet = new LoginAuthenticatePacket
             {

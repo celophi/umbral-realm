@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using UmbralRealm.Core.Network.Interfaces;
+using UmbralRealm.Domain.Enumerations;
 using UmbralRealm.Domain.Models;
 using UmbralRealm.Domain.ValueObjects;
 using UmbralRealm.Login.Data;
@@ -55,7 +56,7 @@ namespace UmbralRealm.Login.Service.Requests
 
             if (accountEntity == null)
             {
-                await this.SendInvalidCredentialsResponse(connection);
+                await connection.SendAsync(new LoginRejectedPacket { Reason = LoginFailureResult.InvalidCredentials1 });
                 return result;
             }
 
@@ -64,7 +65,19 @@ namespace UmbralRealm.Login.Service.Requests
 
             if (account.Password != password)
             {
-                await this.SendInvalidCredentialsResponse(connection);
+                await connection.SendAsync(new LoginRejectedPacket { Reason = LoginFailureResult.InvalidCredentials1 });
+                return result;
+            }
+
+            if (account.Standing == AccountStanding.Suspended)
+            {
+                await connection.SendAsync(new LoginRejectedPacket { Reason = LoginFailureResult.AccountSuspended });
+                return result;
+            }
+
+            if (account.Standing == AccountStanding.Locked)
+            {
+                await connection.SendAsync(new LoginRejectedPacket { Reason = LoginFailureResult.AccountLocked });
                 return result;
             }
 
@@ -72,19 +85,6 @@ namespace UmbralRealm.Login.Service.Requests
             await connection.SendAsync(response);
 
             return result;
-        }
-
-        /// <summary>
-        /// Sends an invalid credentials result to the connection.
-        /// </summary>
-        /// <param name="connection"></param>
-        /// <returns></returns>
-        private async Task SendInvalidCredentialsResponse(IWriteConnection connection)
-        {
-            await connection.SendAsync(new LoginRejectedPacket
-            {
-                Reason = LoginFailureResult.InvalidCredentials1
-            });
         }
     }
 }
