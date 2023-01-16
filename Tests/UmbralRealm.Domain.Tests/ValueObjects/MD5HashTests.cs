@@ -9,15 +9,6 @@ namespace UmbralRealm.Domain.Tests.ValueObjects
     public class MD5HashTests
     {
         [Fact]
-        public async Task Failure()
-        {
-            var a = new DbConnectionFactory("Data Source=localhost\\SQLEXPRESS;Initial Catalog=UmbralRealm;Integrated Security=SSPI;User Id=UmbralRealmReadWrite;Password=UmbralRealmReadWrite");
-            var p = new AccountRepository(a);
-
-            var aa = await p.GetByUsername(new Username("admin2"));
-        }
-
-        [Fact]
         public void WhenConstructed_WithANullArgument_ThrowsException()
         {
             Assert.Throws<ArgumentException>(() => new MD5Hash(null!));
