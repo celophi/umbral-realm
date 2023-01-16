@@ -63,9 +63,10 @@ namespace UmbralRealm.Login.Service
             {
                 var result = await _mediator.Send(request!);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                var a = e;
+                Console.WriteLine(ex.Message);
+                throw;
             }
         }
 

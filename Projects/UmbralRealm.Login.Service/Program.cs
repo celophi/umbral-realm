@@ -83,7 +83,6 @@ namespace UmbralRealm.Login.Service
 
         private static void AddApplication(IServiceCollection services)
         {
-            //IRequestHandler<GenericRequest<LoginAuthenticatePacket>, IPacket>
             services.AddTransient(typeof(IGenericRequest<>), typeof(RequestContext<>));
             services.AddMediatR(AppDomain.CurrentDomain.GetAssemblies());
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
