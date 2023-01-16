@@ -1,17 +1,23 @@
 ﻿using System.Data;
 using Dapper;
-using UmbralRealm.Login.Dto;
+using UmbralRealm.Domain.Entities;
+using UmbralRealm.Domain.ValueObjects;
 
 namespace UmbralRealm.Login.Data
 {
-    public class Provider
+    public class AccountRepository : IAccountRepository
     {
         /// <summary>
         /// Used to create connections to the database.
         /// </summary>
         private readonly IDbConnectionFactory _dbConnectionFactory;
 
-        public Provider(IDbConnectionFactory dbConnectionFactory)
+        /// <summary>
+        /// Creates a repository to interact with the database and account information.
+        /// </summary>
+        /// <param name="dbConnectionFactory"></param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public AccountRepository(IDbConnectionFactory dbConnectionFactory)
         {
             _dbConnectionFactory = dbConnectionFactory ?? throw new ArgumentNullException(nameof(dbConnectionFactory));
         }
@@ -51,26 +57,18 @@ namespace UmbralRealm.Login.Data
             }
         }
 
-        /// <summary>
-        /// Selects an account by the name.
-        /// </summary>
-        /// <param name="name">Unique user name for the account.</param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        public async Task<AccountDto> SelectByName(string name)
+        /// <inheritdoc/>
+        public async Task<AccountEntity> GetByUsername(Username username)
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
+            ArgumentNullException.ThrowIfNull(username);
 
             try
             {
                 var parameters = new DynamicParameters();
-                parameters.Add("name", name, DbType.String);
+                parameters.Add("username", username.Value, DbType.String);
 
                 using var connection = _dbConnectionFactory.Create();
-                return await connection.QueryFirstOrDefaultAsync<AccountDto>("Account_Select_ByName", parameters, commandType: CommandType.StoredProcedure);
+                return await connection.QueryFirstOrDefaultAsync<AccountEntity>("Account_GetByUsername", parameters, commandType: CommandType.StoredProcedure);
             }
             catch (Exception ex)
             {

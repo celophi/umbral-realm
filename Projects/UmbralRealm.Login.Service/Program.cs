@@ -1,5 +1,7 @@
 ﻿using System.Net;
-using System.Threading.Tasks.Dataflow;
+using System.Reflection;
+using FluentValidation;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -8,6 +10,9 @@ using UmbralRealm.Core.Network.Interfaces;
 using UmbralRealm.Core.Network.Packet;
 using UmbralRealm.Core.Security;
 using UmbralRealm.Core.Utilities;
+using UmbralRealm.Login.Data;
+using UmbralRealm.Login.Service.Behaviors;
+using UmbralRealm.Login.Service.Interfaces;
 
 namespace UmbralRealm.Login.Service
 {
@@ -23,7 +28,14 @@ namespace UmbralRealm.Login.Service
             var host = new HostBuilder()
                 .ConfigureServices(services =>
                 {
-                    
+                    Program.AddApplication(services);
+
+                    services.AddScoped<IDbConnectionFactory, DbConnectionFactory>(provider =>
+                    {
+                        var connectionString = configuration.GetConnectionString("Default");
+                        return new DbConnectionFactory(connectionString!);
+                    });
+
                     var loginOpcodeMapping = OpcodeMapping.Create(new Packet.PacketOpcode());
 
                     // Setup server
@@ -46,20 +58,36 @@ namespace UmbralRealm.Login.Service
 
                     mediator2.Subscribe(server);
 
-                    var handler = new Handler();
-                    mediator.Subscribe(handler);
 
-                    services.AddHostedService(provider => listener);
+                    services.AddScoped<IAccountRepository, AccountRepository>();
+                    services.AddScoped<IServerInfoService, ServerInfoService>();
+                    
+                    services.AddHostedService(provider =>
+                    {
+                        var mediator2 = provider.GetService<IMediator>();
+
+                        var handler = new Handler(mediator2!);
+                        mediator.Subscribe(handler);
+
+                        return listener;
+                    });
                 })
                 .UseConsoleLifetime()
                 .Build();
+
 
             host.Run();
 
             Console.WriteLine("Hello, World!");
         }
 
-
+        private static void AddApplication(IServiceCollection services)
+        {
+            services.AddTransient(typeof(IGenericRequest<>), typeof(RequestContext<>));
+            services.AddMediatR(AppDomain.CurrentDomain.GetAssemblies());
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
+            services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+        }
 
         /// <summary>
         /// Parse the options to return a useable endpoint.

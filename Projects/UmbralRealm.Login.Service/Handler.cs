@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
+﻿using System.Threading.Tasks.Dataflow;
+using MediatR;
 using UmbralRealm.Core.Network.Interfaces;
 using UmbralRealm.Core.Network.Packet.Interfaces;
 using UmbralRealm.Core.Utilities.Interfaces;
-using UmbralRealm.Login.Data;
-using UmbralRealm.Login.Packet.Client;
 using UmbralRealm.Login.Packet.Server;
 
 namespace UmbralRealm.Login.Service
@@ -19,9 +13,12 @@ namespace UmbralRealm.Login.Service
 
         private Dictionary<Guid, LoginState> _loginStatuses = new();
 
-        public Handler()
+        private readonly IMediator _mediator;
+
+        public Handler(IMediator mediator)
         {
             _requestQueue.LinkTo(this.CreateActionBlock<IWriteConnection>(this.Handle));
+            _mediator = mediator;
         }
 
         public async Task Handle(IWriteConnection connection)
@@ -47,38 +44,30 @@ namespace UmbralRealm.Login.Service
 
             if (connection.TryGetPacket(out var packet))
             {
-                this.Process(connection, packet);
+                await this.Process(connection, packet);
             }
 
             await _requestQueue.SendAsync(connection);
         }
 
-        private void Process(IWriteConnection connection, IPacket packet)
+        private async Task Process(IWriteConnection connection, IPacket packet)
         {
-            if (packet is LoginAuthenticatePacket)
+            // TODO: Perhaps there is a way to accomplish this without activator.
+
+            var packetType = packet.GetType();
+            var gen = typeof(RequestContext<>).MakeGenericType(new[] { packetType });
+            var request = Activator.CreateInstance(gen, new object[] { connection, packet });
+
+
+            try
             {
-                this.HandleLoginAuthenticatePacket(connection, (LoginAuthenticatePacket)packet);
-                return;
+                var result = await _mediator.Send(request!);
             }
-
-            if (packet is WorldAuthenticatePacket)
+            catch (Exception ex)
             {
-                this.HandleWorldAuthenticatePacket(connection, (WorldAuthenticatePacket)packet);
-                return;
+                Console.WriteLine(ex.Message);
+                throw;
             }
-        }
-
-        private void HandleLoginAuthenticatePacket(IWriteConnection connection, LoginAuthenticatePacket packet)
-        {
-
-            // TODO: handle
-
-        }
-
-        private void HandleWorldAuthenticatePacket(IWriteConnection connection, WorldAuthenticatePacket packet)
-        {
-            // TODO: handle
-
         }
 
         /// <summary>

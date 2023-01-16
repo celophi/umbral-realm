@@ -32,7 +32,13 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "UmbralRealm.Database", "Pro
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UmbralRealm.Login.Service", "Projects\UmbralRealm.Login.Service\UmbralRealm.Login.Service.csproj", "{178AFDD7-FAC4-4398-BB87-D9BD3E5B2389}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbralRealm.Archiver.Tests", "Tests\UmbralRealm.Archiver.Tests\UmbralRealm.Archiver.Tests.csproj", "{07E50E52-8B34-4610-AC90-4268FF5AA455}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UmbralRealm.Archiver.Tests", "Tests\UmbralRealm.Archiver.Tests\UmbralRealm.Archiver.Tests.csproj", "{07E50E52-8B34-4610-AC90-4268FF5AA455}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UmbralRealm.Domain", "Projects\UmbralRealm.Domain\UmbralRealm.Domain.csproj", "{37014DC4-0CFD-4CA5-A591-A3BAC6DB650E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UmbralRealm.Domain.Tests", "Tests\UmbralRealm.Domain.Tests\UmbralRealm.Domain.Tests.csproj", "{4507F6EA-8DA0-497D-9407-BFE05A72665B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbralRealm.Login.Service.Tests", "Tests\UmbralRealm.Login.Service.Tests\UmbralRealm.Login.Service.Tests.csproj", "{0C75C090-E87B-4230-857A-938AFB7B31F1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -85,6 +91,18 @@ Global
 		{07E50E52-8B34-4610-AC90-4268FF5AA455}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{07E50E52-8B34-4610-AC90-4268FF5AA455}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{07E50E52-8B34-4610-AC90-4268FF5AA455}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37014DC4-0CFD-4CA5-A591-A3BAC6DB650E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37014DC4-0CFD-4CA5-A591-A3BAC6DB650E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37014DC4-0CFD-4CA5-A591-A3BAC6DB650E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37014DC4-0CFD-4CA5-A591-A3BAC6DB650E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4507F6EA-8DA0-497D-9407-BFE05A72665B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4507F6EA-8DA0-497D-9407-BFE05A72665B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4507F6EA-8DA0-497D-9407-BFE05A72665B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4507F6EA-8DA0-497D-9407-BFE05A72665B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C75C090-E87B-4230-857A-938AFB7B31F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C75C090-E87B-4230-857A-938AFB7B31F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C75C090-E87B-4230-857A-938AFB7B31F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C75C090-E87B-4230-857A-938AFB7B31F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -101,6 +119,9 @@ Global
 		{2BCDC9DB-2F0B-4607-804E-0754F6413E9F} = {ED49CE50-7281-4837-92DE-37E42FB10B0B}
 		{178AFDD7-FAC4-4398-BB87-D9BD3E5B2389} = {ED49CE50-7281-4837-92DE-37E42FB10B0B}
 		{07E50E52-8B34-4610-AC90-4268FF5AA455} = {45E3CC49-8622-4979-92BC-C42009C06E8E}
+		{37014DC4-0CFD-4CA5-A591-A3BAC6DB650E} = {ED49CE50-7281-4837-92DE-37E42FB10B0B}
+		{4507F6EA-8DA0-497D-9407-BFE05A72665B} = {45E3CC49-8622-4979-92BC-C42009C06E8E}
+		{0C75C090-E87B-4230-857A-938AFB7B31F1} = {45E3CC49-8622-4979-92BC-C42009C06E8E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B54FABAF-44EC-4CAF-96E0-D00F6DDC82C4}

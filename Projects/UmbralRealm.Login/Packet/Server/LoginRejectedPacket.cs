@@ -14,6 +14,6 @@ namespace UmbralRealm.Login.Packet.Server
         /// Unknown, but my guess is that this is some index to the reason of the failure.
         /// </summary>
         [FieldOrder(0)]
-        public ushort Reason { get; set; }
+        public LoginFailureResult Reason { get; set; }
     }
 }
